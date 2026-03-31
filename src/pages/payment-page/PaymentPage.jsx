@@ -3,6 +3,13 @@ import StoreNavbar from '../../components/store-navbar/StoreNavbar'
 import SiteFooter from '../../components/site-footer/SiteFooter'
 import './PaymentPage.css'
 
+const upiApps = [
+  { id: 'gpay', label: 'Google Pay' },
+  { id: 'phonepe', label: 'PhonePe' },
+  { id: 'paytm', label: 'Paytm' },
+  { id: 'bhim', label: 'BHIM UPI' },
+]
+
 function PaymentPage({
   user,
   products,
@@ -18,12 +25,14 @@ function PaymentPage({
 }) {
   const [paymentMethod, setPaymentMethod] = useState('upi')
   const [paymentDetails, setPaymentDetails] = useState({
+    upiApp: 'gpay',
     upiId: '',
     cardName: '',
     cardNumber: '',
     expiry: '',
     cvv: '',
   })
+  const [upiRequestSent, setUpiRequestSent] = useState(false)
 
   const cartDetails = useMemo(
     () =>
@@ -41,22 +50,68 @@ function PaymentPage({
   const subtotal = cartDetails.reduce((sum, item) => sum + item.subtotal, 0)
   const shipping = subtotal > 0 ? 90 : 0
   const total = subtotal + shipping
+  const merchantUpiId = 'payments.nhn@oksbi'
+  const merchantName = 'Neha Healthy Naturals'
+  const selectedUpiApp = upiApps.find((app) => app.id === paymentDetails.upiApp)
+  const upiLink = `upi://pay?pa=${encodeURIComponent(merchantUpiId)}&pn=${encodeURIComponent(
+    merchantName,
+  )}&am=${total}&cu=INR&tn=${encodeURIComponent(`NHN order payment by ${checkoutDraft.customerName}`)}`
 
   const handleChange = (event) => {
     const { name, value } = event.target
     setPaymentDetails((current) => ({ ...current, [name]: value }))
+
+    if (name === 'upiApp' || name === 'upiId') {
+      setUpiRequestSent(false)
+    }
+  }
+
+  const handleSendUpiRequest = () => {
+    setUpiRequestSent(true)
   }
 
   const handlePayment = (event) => {
     event.preventDefault()
+
+    const paidAt = new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    const transactionId = `PAY-${Date.now()}`
+
     const label =
       paymentMethod === 'upi'
-        ? `UPI • ${paymentDetails.upiId || 'Express'}`
+        ? `UPI • ${selectedUpiApp?.label ?? 'UPI'}`
         : `Card • ${paymentDetails.cardNumber.slice(-4) || 'XXXX'}`
+
+    const paymentSummary =
+      paymentMethod === 'upi'
+        ? {
+            status: 'Paid',
+            amount: total,
+            app: selectedUpiApp?.label ?? 'UPI',
+            upiId: paymentDetails.upiId,
+            merchantUpiId,
+            transactionId,
+            paidAt,
+          }
+        : {
+            status: 'Paid',
+            amount: total,
+            app: 'Card Payment',
+            cardHolder: paymentDetails.cardName,
+            last4: paymentDetails.cardNumber.slice(-4),
+            transactionId,
+            paidAt,
+          }
 
     onPlaceOrder({
       paymentMethod,
       paymentLabel: label,
+      paymentDetails: paymentSummary,
     })
   }
 
@@ -104,7 +159,9 @@ function PaymentPage({
                   <img src={product?.image} alt={product?.name} />
                   <div>
                     <strong>{product?.name}</strong>
-                    <p>{quantity} x Rs {product?.price}</p>
+                    <p>
+                      {quantity} x Rs {product?.price}
+                    </p>
                   </div>
                   <strong>Rs {lineTotal}</strong>
                 </article>
@@ -112,9 +169,18 @@ function PaymentPage({
             </div>
 
             <div className="payment-page__totals">
-              <div><span>Subtotal</span><strong>Rs {subtotal}</strong></div>
-              <div><span>Shipping</span><strong>Rs {shipping}</strong></div>
-              <div className="payment-page__totals-grand"><span>Total</span><strong>Rs {total}</strong></div>
+              <div>
+                <span>Subtotal</span>
+                <strong>Rs {subtotal}</strong>
+              </div>
+              <div>
+                <span>Shipping</span>
+                <strong>Rs {shipping}</strong>
+              </div>
+              <div className="payment-page__totals-grand">
+                <span>Total</span>
+                <strong>Rs {total}</strong>
+              </div>
             </div>
           </div>
 
@@ -126,14 +192,22 @@ function PaymentPage({
             <div className="payment-page__method-switch">
               <button
                 type="button"
-                className={paymentMethod === 'upi' ? 'payment-page__method-button payment-page__method-button--active' : 'payment-page__method-button'}
+                className={
+                  paymentMethod === 'upi'
+                    ? 'payment-page__method-button payment-page__method-button--active'
+                    : 'payment-page__method-button'
+                }
                 onClick={() => setPaymentMethod('upi')}
               >
                 UPI
               </button>
               <button
                 type="button"
-                className={paymentMethod === 'card' ? 'payment-page__method-button payment-page__method-button--active' : 'payment-page__method-button'}
+                className={
+                  paymentMethod === 'card'
+                    ? 'payment-page__method-button payment-page__method-button--active'
+                    : 'payment-page__method-button'
+                }
                 onClick={() => setPaymentMethod('card')}
               >
                 Card
@@ -141,13 +215,43 @@ function PaymentPage({
             </div>
 
             {paymentMethod === 'upi' ? (
-              <input
-                name="upiId"
-                value={paymentDetails.upiId}
-                onChange={handleChange}
-                placeholder="Enter UPI ID"
-                required
-              />
+              <div className="payment-page__upi-block">
+                <select name="upiApp" value={paymentDetails.upiApp} onChange={handleChange} required>
+                  {upiApps.map((app) => (
+                    <option key={app.id} value={app.id}>
+                      {app.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  name="upiId"
+                  value={paymentDetails.upiId}
+                  onChange={handleChange}
+                  placeholder="Enter your UPI ID"
+                  required
+                />
+                <div className="payment-page__request-card">
+                  <strong>UPI App Request</strong>
+                  <p>
+                    Use {selectedUpiApp?.label} to pay Rs {total} to {merchantName}.
+                  </p>
+                  <small>Merchant UPI ID: {merchantUpiId}</small>
+                  <div className="payment-page__request-actions">
+                    <button type="button" className="payment-page__ghost-button" onClick={handleSendUpiRequest}>
+                      Prepare Request
+                    </button>
+                    {upiRequestSent && (
+                      <a className="payment-page__upi-link" href={upiLink}>
+                        Open {selectedUpiApp?.label}
+                      </a>
+                    )}
+                  </div>
+                  <small>
+                    Real collect requests need backend gateway integration. This app opens the selected UPI app with the
+                    payment amount and merchant details already filled in.
+                  </small>
+                </div>
+              </div>
             ) : (
               <>
                 <input
@@ -171,7 +275,11 @@ function PaymentPage({
               </>
             )}
 
-            <button type="submit" className="payment-page__primary-button" disabled={!cartDetails.length}>
+            <button
+              type="submit"
+              className="payment-page__primary-button"
+              disabled={!cartDetails.length || (paymentMethod === 'upi' && !upiRequestSent)}
+            >
               Pay Rs {total}
             </button>
           </form>

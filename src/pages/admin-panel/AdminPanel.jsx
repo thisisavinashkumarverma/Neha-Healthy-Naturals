@@ -23,6 +23,7 @@ function AdminPanel({
     { label: 'New Product', route: 'admin-new-product' },
     { label: 'Inventory', route: 'admin-inventory' },
     { label: 'Orders', route: 'admin-orders' },
+    { label: 'Payments', route: 'admin-payments' },
   ]
 
   return (

@@ -164,6 +164,51 @@
   margin-top: 1rem;
 }
 
+.admin-overview__payment-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(136, 102, 65, 0.1);
+}
+
+.admin-overview__payment-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-overview__payment-head span {
+  color: #8e481d;
+  font-weight: 700;
+}
+
+.admin-overview__payment-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+}
+
+.admin-overview__payment-grid div {
+  padding: 0.85rem;
+  border-radius: 18px;
+  background: rgba(255, 249, 241, 0.78);
+  border: 1px solid rgba(136, 102, 65, 0.08);
+}
+
+.admin-overview__payment-grid strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #33261d;
+}
+
+.admin-overview__payment-grid p {
+  margin: 0;
+  color: #6d5c4d;
+}
+
 .admin-overview__toolbar {
   display: grid;
   grid-template-columns: 1fr 220px;
@@ -340,7 +385,8 @@
   .admin-overview__panels,
   .admin-overview__metrics,
   .admin-overview__insights-grid,
-  .admin-overview__form-grid {
+  .admin-overview__form-grid,
+  .admin-overview__payment-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -373,7 +419,8 @@
 
   .admin-overview__inventory-actions,
   .admin-overview__order-head,
-  .admin-overview__order-meta {
+  .admin-overview__order-meta,
+  .admin-overview__payment-head {
     flex-direction: column;
     align-items: flex-start;
   }

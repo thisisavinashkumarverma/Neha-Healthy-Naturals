@@ -10,6 +10,8 @@ import OrdersPage from './pages/orders-page/OrdersPage'
 import PaymentPage from './pages/payment-page/PaymentPage'
 import { initialProducts } from './data/catalog'
 
+const STORAGE_KEY = 'nhn-app-state'
+
 const publicRoutes = new Set([
   'landing',
   'landing-collections',
@@ -35,6 +37,7 @@ const adminRoutes = new Set([
   'admin-new-product',
   'admin-inventory',
   'admin-orders',
+  'admin-payments',
 ])
 
 const defaultUser = {
@@ -43,22 +46,40 @@ const defaultUser = {
   role: 'customer',
 }
 
+const defaultCheckoutDraft = {
+  customerName: defaultUser.name,
+  customerEmail: defaultUser.email,
+  address: '',
+  phone: '',
+  notes: '',
+}
+
+const getDefaultProducts = () => initialProducts.map((product) => ({ ...product, published: true }))
+
+const loadStoredState = () => {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  try {
+    const rawState = window.localStorage.getItem(STORAGE_KEY)
+    return rawState ? JSON.parse(rawState) : null
+  } catch {
+    return null
+  }
+}
+
 function App() {
-  const [currentView, setCurrentView] = useState('landing')
-  const [currentUser, setCurrentUser] = useState(defaultUser)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [products, setProducts] = useState(initialProducts.map((product) => ({ ...product, published: true })))
-  const [cartItems, setCartItems] = useState([])
-  const [wishlist, setWishlist] = useState([])
-  const [orders, setOrders] = useState([])
+  const storedState = loadStoredState()
+  const [currentView, setCurrentView] = useState(storedState?.currentView ?? 'landing')
+  const [currentUser, setCurrentUser] = useState(storedState?.currentUser ?? defaultUser)
+  const [isAuthenticated, setIsAuthenticated] = useState(storedState?.isAuthenticated ?? false)
+  const [products, setProducts] = useState(storedState?.products ?? getDefaultProducts())
+  const [cartItems, setCartItems] = useState(storedState?.cartItems ?? [])
+  const [wishlist, setWishlist] = useState(storedState?.wishlist ?? [])
+  const [orders, setOrders] = useState(storedState?.orders ?? [])
   const [toastMessage, setToastMessage] = useState('')
-  const [checkoutDraft, setCheckoutDraft] = useState({
-    customerName: defaultUser.name,
-    customerEmail: defaultUser.email,
-    address: '',
-    phone: '',
-    notes: '',
-  })
+  const [checkoutDraft, setCheckoutDraft] = useState(storedState?.checkoutDraft ?? defaultCheckoutDraft)
 
   const navigate = (view) => {
     if (publicRoutes.has(view)) {
@@ -117,6 +138,7 @@ function App() {
     if (currentView === 'admin-new-product') return 'new-product'
     if (currentView === 'admin-inventory') return 'inventory'
     if (currentView === 'admin-orders') return 'orders'
+    if (currentView === 'admin-payments') return 'payments'
     return 'insights'
   }
 
@@ -168,14 +190,14 @@ function App() {
   const handleLogout = () => {
     setIsAuthenticated(false)
     setCurrentUser(defaultUser)
-    setCheckoutDraft({
-      customerName: defaultUser.name,
-      customerEmail: defaultUser.email,
-      address: '',
-      phone: '',
-      notes: '',
-    })
+    setCheckoutDraft(defaultCheckoutDraft)
+    setCartItems([])
+    setWishlist([])
     setCurrentView('landing')
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(STORAGE_KEY)
+    }
   }
 
   const handleToggleWishlist = (productId) => {
@@ -217,7 +239,7 @@ function App() {
     setCurrentView('home-payment')
   }
 
-  const handlePlaceOrder = ({ paymentMethod, paymentLabel }) => {
+  const handlePlaceOrder = ({ paymentMethod, paymentLabel, paymentDetails }) => {
     if (!cartItems.length) return
 
     const orderProducts = cartItems.map((item) => {
@@ -242,6 +264,8 @@ function App() {
         notes: checkoutDraft.notes,
         paymentMethod,
         paymentLabel,
+        paymentDetails,
+        paidAt: paymentDetails?.status === 'Paid' ? paymentDetails.paidAt : '',
         status: 'Confirmed',
         createdAt: new Date().toLocaleDateString('en-IN', {
           day: '2-digit',
@@ -363,6 +387,40 @@ function App() {
 
     return () => clearTimeout(timer)
   }, [toastMessage])
+
+  useEffect(() => {
+    if (!isAuthenticated && (customerRoutes.has(currentView) || adminRoutes.has(currentView))) {
+      setCurrentView('landing')
+      return
+    }
+
+    if (isAuthenticated && currentUser.role === 'customer' && adminRoutes.has(currentView)) {
+      setCurrentView('home')
+      return
+    }
+
+    if (isAuthenticated && currentUser.role === 'admin' && customerRoutes.has(currentView)) {
+      setCurrentView('admin-insights')
+    }
+  }, [currentView, currentUser.role, isAuthenticated])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        currentView,
+        currentUser,
+        isAuthenticated,
+        products,
+        cartItems,
+        wishlist,
+        orders,
+        checkoutDraft,
+      }),
+    )
+  }, [currentView, currentUser, isAuthenticated, products, cartItems, wishlist, orders, checkoutDraft])
 
   return (
     <div className="app-shell">

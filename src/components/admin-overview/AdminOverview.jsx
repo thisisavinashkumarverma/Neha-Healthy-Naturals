@@ -108,6 +108,7 @@ function AdminOverview({
   const showNewProduct = activeSection === 'new-product'
   const showInventory = activeSection === 'inventory'
   const showOrders = activeSection === 'orders'
+  const showPayments = activeSection === 'payments'
 
   return (
     <section className="admin-overview">
@@ -281,50 +282,111 @@ function AdminOverview({
 
       {showOrders && (
         <div className="admin-overview__panels admin-overview__panels--single">
-        <section className="admin-overview__panel">
-          <div className="admin-overview__section-head">
-            <div>
-              <h2>Order Management</h2>
-              <p>Filter incoming orders and update fulfillment progress from one operational queue.</p>
-            </div>
-          </div>
-          <div className="admin-overview__toolbar">
-            <select value={orderFilter} onChange={(event) => setOrderFilter(event.target.value)}>
-              <option value="all">All orders</option>
-              {statusOptions.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="admin-overview__orders">
-            {orders.length === 0 && <p className="admin-overview__empty">Orders placed by customers will appear here.</p>}
-            {filteredOrders.map((order) => (
-              <div key={order.id} className="admin-overview__order-card">
-                <div className="admin-overview__order-head">
-                  <div>
-                    <strong>{order.id}</strong>
-                    <p>{order.customerName}</p>
-                  </div>
-                  <span>Rs {order.total}</span>
-                </div>
-                <p>{order.items.map((item) => `${item.name} x${item.quantity}`).join(', ')}</p>
-                <div className="admin-overview__order-meta">
-                  <small>{order.paymentLabel}</small>
-                  <small>{order.customerEmail}</small>
-                </div>
-                <select value={order.status} onChange={(event) => onUpdateOrderStatus(order.id, event.target.value)}>
-                  {statusOptions.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
+          <section className="admin-overview__panel">
+            <div className="admin-overview__section-head">
+              <div>
+                <h2>Order Management</h2>
+                <p>Filter incoming orders and update fulfillment progress from one operational queue.</p>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+            <div className="admin-overview__toolbar">
+              <select value={orderFilter} onChange={(event) => setOrderFilter(event.target.value)}>
+                <option value="all">All orders</option>
+                {statusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="admin-overview__orders">
+              {orders.length === 0 && <p className="admin-overview__empty">Orders placed by customers will appear here.</p>}
+              {filteredOrders.map((order) => (
+                <div key={order.id} className="admin-overview__order-card">
+                  <div className="admin-overview__order-head">
+                    <div>
+                      <strong>{order.id}</strong>
+                      <p>{order.customerName}</p>
+                    </div>
+                    <span>Rs {order.total}</span>
+                  </div>
+                  <p>{order.items.map((item) => `${item.name} x${item.quantity}`).join(', ')}</p>
+                  <div className="admin-overview__order-meta">
+                    <small>{order.paymentLabel}</small>
+                    <small>{order.customerEmail}</small>
+                  </div>
+                  <select value={order.status} onChange={(event) => onUpdateOrderStatus(order.id, event.target.value)}>
+                    {statusOptions.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {showPayments && (
+        <div className="admin-overview__panels admin-overview__panels--single">
+          <section className="admin-overview__panel">
+            <div className="admin-overview__section-head">
+              <div>
+                <h2>Payment Details</h2>
+                <p>Review who paid, how much they paid, when the payment happened, and which method or app was used.</p>
+              </div>
+            </div>
+            <div className="admin-overview__orders">
+              {orders.length === 0 && <p className="admin-overview__empty">Completed customer payments will appear here.</p>}
+              {orders.map((order) => (
+                <article key={`payment-${order.id}`} className="admin-overview__payment-card">
+                  <div className="admin-overview__payment-head">
+                    <div>
+                      <strong>{order.customerName}</strong>
+                      <p>{order.customerEmail}</p>
+                    </div>
+                    <span>Rs {order.paymentDetails?.amount ?? order.total}</span>
+                  </div>
+                  <div className="admin-overview__payment-grid">
+                    <div>
+                      <strong>Order ID</strong>
+                      <p>{order.id}</p>
+                    </div>
+                    <div>
+                      <strong>Payment Method</strong>
+                      <p>{order.paymentLabel}</p>
+                    </div>
+                    <div>
+                      <strong>Paid Via</strong>
+                      <p>{order.paymentDetails?.app ?? order.paymentMethod}</p>
+                    </div>
+                    <div>
+                      <strong>Paid On</strong>
+                      <p>{order.paymentDetails?.paidAt ?? order.createdAt}</p>
+                    </div>
+                    <div>
+                      <strong>Transaction ID</strong>
+                      <p>{order.paymentDetails?.transactionId ?? 'Not available'}</p>
+                    </div>
+                    <div>
+                      <strong>Status</strong>
+                      <p>{order.paymentDetails?.status ?? 'Pending'}</p>
+                    </div>
+                    <div>
+                      <strong>Customer UPI</strong>
+                      <p>{order.paymentDetails?.upiId ?? 'Not applicable'}</p>
+                    </div>
+                    <div>
+                      <strong>Merchant UPI</strong>
+                      <p>{order.paymentDetails?.merchantUpiId ?? 'Not applicable'}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
       )}
     </section>

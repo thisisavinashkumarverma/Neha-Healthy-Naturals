@@ -158,6 +158,52 @@
   color: #2f241c;
 }
 
+.payment-page__form select {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(126, 93, 55, 0.12);
+  background: rgba(255, 255, 255, 0.86);
+  color: #2f241c;
+}
+
+.payment-page__upi-block {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.payment-page__request-card {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(126, 93, 55, 0.1);
+}
+
+.payment-page__request-card p,
+.payment-page__request-card small {
+  color: #6c5a48;
+}
+
+.payment-page__request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.payment-page__upi-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(135deg, #8e3f17 0%, #cb7e27 100%);
+  color: #fffaf3;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .payment-page__card-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -200,7 +246,12 @@
   }
 
   .payment-page__ghost-button,
-  .payment-page__primary-button {
+  .payment-page__primary-button,
+  .payment-page__upi-link {
     width: 100%;
+  }
+
+  .payment-page__request-actions {
+    flex-direction: column;
   }
 }
