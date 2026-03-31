@@ -1,0 +1,217 @@
+.admin-overview {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.admin-overview__hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+  padding: 1.6rem;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #312116 0%, #6c3a19 55%, #b47126 100%);
+  color: #fff7ef;
+  box-shadow: 0 26px 48px rgba(73, 42, 17, 0.18);
+}
+
+.admin-overview__hero span {
+  display: inline-block;
+  margin-bottom: 0.8rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.admin-overview__hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.admin-overview__hero p {
+  margin-bottom: 0;
+  color: rgba(255, 247, 239, 0.84);
+}
+
+.admin-overview__highlight {
+  padding: 1.2rem;
+  border-radius: 24px;
+  background: rgba(255, 247, 239, 0.11);
+  align-self: end;
+}
+
+.admin-overview__highlight strong {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.admin-overview__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.admin-overview__metrics article {
+  padding: 1.25rem;
+  border-radius: 22px;
+  background: rgba(255, 250, 243, 0.82);
+  border: 1px solid rgba(136, 102, 65, 0.1);
+}
+
+.admin-overview__metrics span {
+  color: #6d5c4d;
+}
+
+.admin-overview__metrics strong {
+  display: block;
+  margin-top: 0.45rem;
+  color: #35271f;
+  font-size: 1.5rem;
+}
+
+.admin-overview__panels {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1rem;
+}
+
+.admin-overview__panel {
+  padding: 1.4rem;
+  border-radius: 24px;
+  background: rgba(255, 250, 243, 0.82);
+  border: 1px solid rgba(136, 102, 65, 0.1);
+}
+
+.admin-overview__section-head h2 {
+  margin: 0;
+  color: #33261d;
+}
+
+.admin-overview__section-head p,
+.admin-overview__order-card p,
+.admin-overview__inventory-row p,
+.admin-overview__empty {
+  color: #6d5c4d;
+}
+
+.admin-overview__inventory,
+.admin-overview__orders {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.admin-overview__inventory-row,
+.admin-overview__order-card {
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.95rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(136, 102, 65, 0.1);
+}
+
+.admin-overview__inventory-row img {
+  width: 88px;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fff7ee, #f5e3cf);
+}
+
+.admin-overview__inventory-row p,
+.admin-overview__order-card p {
+  margin: 0.25rem 0;
+}
+
+.admin-overview__inventory-row span {
+  color: #8e481d;
+  font-weight: 700;
+}
+
+.admin-overview__inventory-actions {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.admin-overview__inventory-actions button,
+.admin-overview__order-card select {
+  font: inherit;
+}
+
+.admin-overview__inventory-actions button {
+  border: 1px solid rgba(136, 102, 65, 0.12);
+  background: #fff;
+  color: #5b4735;
+  border-radius: 999px;
+  padding: 0.55rem 0.8rem;
+}
+
+.admin-overview__feature-toggle {
+  background: linear-gradient(135deg, #8e3f17 0%, #cb7e27 100%) !important;
+  color: #fffaf3 !important;
+  border: 0 !important;
+}
+
+.admin-overview__order-card {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.admin-overview__order-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.admin-overview__order-head span {
+  color: #8e481d;
+  font-weight: 700;
+}
+
+.admin-overview__order-card select {
+  width: 100%;
+  padding: 0.8rem 0.95rem;
+  border-radius: 16px;
+  border: 1px solid rgba(136, 102, 65, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+@media (max-width: 1024px) {
+  .admin-overview__hero,
+  .admin-overview__panels,
+  .admin-overview__metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-overview {
+    gap: 1rem;
+  }
+
+  .admin-overview__hero,
+  .admin-overview__panel,
+  .admin-overview__metrics article {
+    padding: 1.1rem;
+    border-radius: 20px;
+  }
+
+  .admin-overview__inventory-row {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .admin-overview__inventory-row img {
+    width: 100%;
+  }
+
+  .admin-overview__inventory-actions,
+  .admin-overview__order-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

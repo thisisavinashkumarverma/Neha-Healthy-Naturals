@@ -1,0 +1,14 @@
+.admin-panel-page {
+  padding: 1.25rem;
+}
+
+.admin-panel-page__container {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .admin-panel-page {
+    padding: 1rem;
+  }
+}

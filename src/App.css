@@ -1,0 +1,25 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-toast {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 100;
+  padding: 0.95rem 1.15rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #8e3f17 0%, #cb7e27 100%);
+  color: #fffaf3;
+  font-weight: 700;
+  box-shadow: 0 20px 40px rgba(74, 42, 17, 0.18);
+}
+
+@media (max-width: 640px) {
+  .app-toast {
+    top: auto;
+    right: 1rem;
+    left: 1rem;
+    bottom: 1rem;
+  }
+}

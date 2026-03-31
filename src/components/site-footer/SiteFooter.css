@@ -1,0 +1,119 @@
+.site-footer {
+  margin-top: 2rem;
+}
+
+.site-footer__main {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.5rem;
+  padding: 1.8rem;
+  border-radius: 28px;
+  background: linear-gradient(145deg, #2e1d12 0%, #6f3c1a 55%, #b8742a 100%);
+  color: #fff8f1;
+  box-shadow: 0 24px 48px rgba(74, 42, 17, 0.18);
+}
+
+.site-footer__brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.site-footer__brand span {
+  display: grid;
+  place-items: center;
+  min-width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: rgba(255, 248, 241, 0.14);
+  color: #fff8f1;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.site-footer__brand strong {
+  display: block;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}
+
+.site-footer__brand p {
+  margin: 0.55rem 0 0;
+  max-width: 420px;
+  color: rgba(255, 248, 241, 0.82);
+}
+
+.site-footer__links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.site-footer__links h3 {
+  margin: 0 0 0.85rem;
+  font-size: 1rem;
+  color: #fff8f1;
+}
+
+.site-footer__links a,
+.site-footer__links span {
+  display: block;
+  margin-bottom: 0.6rem;
+  color: rgba(255, 248, 241, 0.8);
+}
+
+.site-footer__nav-button {
+  display: block;
+  margin-bottom: 0.6rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 248, 241, 0.8);
+  text-align: left;
+}
+
+.site-footer__links a:hover {
+  color: #ffffff;
+}
+
+.site-footer__nav-button:hover {
+  color: #ffffff;
+}
+
+.site-footer__copyright {
+  padding: 1rem 0 0.25rem;
+  text-align: center;
+  color: #6d5b49;
+  font-size: 0.95rem;
+}
+
+.site-footer__copyright p {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .site-footer__main,
+  .site-footer__links {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-footer__main {
+    padding: 1.25rem;
+    border-radius: 22px;
+  }
+
+  .site-footer__brand {
+    flex-direction: column;
+  }
+
+  .site-footer__links {
+    gap: 0.35rem;
+  }
+
+  .site-footer__copyright {
+    font-size: 0.86rem;
+    padding-top: 0.85rem;
+  }
+}
