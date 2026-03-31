@@ -1,6 +1,5 @@
 import BrandHeader from '../../components/brand-header/BrandHeader'
 import SiteFooter from '../../components/site-footer/SiteFooter'
-import { initialProducts } from '../../data/catalog'
 import './LandingPage.css'
 
 const collectionCards = [
@@ -20,8 +19,6 @@ const collectionCards = [
     accent: 'sage',
   },
 ]
-
-const guestProducts = initialProducts
 
 const experiencePoints = [
   'Single-vendor quality control across sourcing, blending, and packing',
@@ -46,7 +43,7 @@ const testimonials = [
   },
 ]
 
-function LandingPage({ onNavigate, onLoginClick, onSignupClick, isAuthenticated = false }) {
+function LandingPage({ products = [], onNavigate, onLoginClick, onSignupClick, isAuthenticated = false }) {
   return (
     <main className="landing-page">
       <div className="landing-page__container">
@@ -149,7 +146,7 @@ function LandingPage({ onNavigate, onLoginClick, onSignupClick, isAuthenticated 
           </div>
 
           <div className="landing-page__guest-products">
-            {guestProducts.map((product) => (
+            {products.map((product) => (
               <article key={product.id} className="landing-page__guest-card">
                 <div className="landing-page__guest-image">
                   <img src={product.image} alt={product.name} />

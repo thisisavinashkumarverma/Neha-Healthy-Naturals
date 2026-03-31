@@ -29,6 +29,14 @@ const customerRoutes = new Set([
   'home-payment',
 ])
 
+const adminRoutes = new Set([
+  'admin',
+  'admin-insights',
+  'admin-new-product',
+  'admin-inventory',
+  'admin-orders',
+])
+
 const defaultUser = {
   name: 'Priya',
   email: 'priya@nhn.com',
@@ -39,7 +47,7 @@ function App() {
   const [currentView, setCurrentView] = useState('landing')
   const [currentUser, setCurrentUser] = useState(defaultUser)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState(initialProducts.map((product) => ({ ...product, published: true })))
   const [cartItems, setCartItems] = useState([])
   const [wishlist, setWishlist] = useState([])
   const [orders, setOrders] = useState([])
@@ -73,7 +81,7 @@ function App() {
       return
     }
 
-    if (view === 'admin') {
+    if (adminRoutes.has(view)) {
       if (!isAuthenticated) {
         setCurrentView('login')
         return
@@ -84,7 +92,7 @@ function App() {
         return
       }
 
-      setCurrentView('admin')
+      setCurrentView(view)
     }
   }
 
@@ -105,9 +113,16 @@ function App() {
     return 'home'
   }
 
+  const getAdminSection = () => {
+    if (currentView === 'admin-new-product') return 'new-product'
+    if (currentView === 'admin-inventory') return 'inventory'
+    if (currentView === 'admin-orders') return 'orders'
+    return 'insights'
+  }
+
   const handleAdminEntry = () => {
     if (currentUser.role === 'admin') {
-      navigate('admin')
+      navigate('admin-insights')
       return
     }
 
@@ -130,7 +145,7 @@ function App() {
       phone: '',
       notes: '',
     })
-    setCurrentView(role === 'admin' ? 'admin' : 'home')
+    setCurrentView(role === 'admin' ? 'admin-insights' : 'home')
   }
 
   const handleSignup = ({ name, email }) => {
@@ -268,6 +283,57 @@ function App() {
     )
   }
 
+  const handleAddProduct = (productData) => {
+    const baseVisual = products.find((product) => product.id === productData.visualSourceId) ?? products[0]
+    const normalizedId = productData.name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+
+    const uniqueId = `${normalizedId || 'new-product'}-${products.length + 1}`
+
+    const newProduct = {
+      id: uniqueId,
+      name: productData.name.trim(),
+      category: productData.category.trim(),
+      price: Number(productData.price),
+      originalPrice: Number(productData.originalPrice || productData.price),
+      size: productData.size.trim(),
+      rating: 4.6,
+      reviews: 0,
+      stock: Number(productData.stock),
+      featured: false,
+      published: false,
+      badge: 'New Arrival',
+      image: baseVisual?.image ?? products[0]?.image,
+      shortDescription: productData.shortDescription.trim(),
+      description: productData.description.trim(),
+      benefits: [
+        productData.benefitOne.trim(),
+        productData.benefitTwo.trim(),
+        productData.benefitThree.trim(),
+      ].filter(Boolean),
+    }
+
+    setProducts((current) => [newProduct, ...current])
+    setToastMessage(`${newProduct.name} added as draft`)
+  }
+
+  const handleTogglePublish = (productId) => {
+    let nextPublished = false
+
+    setProducts((current) =>
+      current.map((product) => {
+        if (product.id !== productId) return product
+        nextPublished = !product.published
+        return { ...product, published: nextPublished }
+      }),
+    )
+
+    setToastMessage(nextPublished ? 'Product published for customers' : 'Product moved back to draft')
+  }
+
   const handleUpdateOrderStatus = (orderId, status) => {
     setOrders((current) =>
       current.map((order) => (order.id === orderId ? { ...order, status } : order)),
@@ -286,6 +352,7 @@ function App() {
   }
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  const storefrontProducts = products.filter((product) => product.published)
 
   useEffect(() => {
     if (!toastMessage) return undefined
@@ -305,6 +372,7 @@ function App() {
         currentView === 'landing-contact') && (
         <LandingPage
           activeSection={getLandingSection()}
+          products={storefrontProducts}
           onNavigate={navigate}
           onLoginClick={() => navigate('login')}
           onSignupClick={() => navigate('signup')}
@@ -339,7 +407,7 @@ function App() {
         <HomePage
           activeSection={getHomeSection()}
           user={currentUser}
-          products={products}
+          products={storefrontProducts}
           cartItems={cartItems}
           wishlist={wishlist}
           orders={orders}
@@ -358,7 +426,7 @@ function App() {
       {currentView === 'home-cart' && isAuthenticated && currentUser.role === 'customer' && (
         <CartPage
           user={currentUser}
-          products={products}
+          products={storefrontProducts}
           cartItems={cartItems}
           checkoutDraft={checkoutDraft}
           cartCount={cartCount}
@@ -386,7 +454,7 @@ function App() {
       {currentView === 'home-payment' && isAuthenticated && currentUser.role === 'customer' && (
         <PaymentPage
           user={currentUser}
-          products={products}
+          products={storefrontProducts}
           cartItems={cartItems}
           checkoutDraft={checkoutDraft}
           cartCount={cartCount}
@@ -399,8 +467,9 @@ function App() {
         />
       )}
 
-      {currentView === 'admin' && isAuthenticated && currentUser.role === 'admin' && (
+      {adminRoutes.has(currentView) && isAuthenticated && currentUser.role === 'admin' && (
         <AdminPanel
+          activeSection={getAdminSection()}
           user={currentUser}
           products={products}
           orders={orders}
@@ -409,6 +478,8 @@ function App() {
           onOpenStore={() => navigate('home')}
           onAdjustInventory={handleAdjustInventory}
           onToggleFeatured={handleToggleFeatured}
+          onAddProduct={handleAddProduct}
+          onTogglePublish={handleTogglePublish}
           onUpdateOrderStatus={handleUpdateOrderStatus}
         />
       )}

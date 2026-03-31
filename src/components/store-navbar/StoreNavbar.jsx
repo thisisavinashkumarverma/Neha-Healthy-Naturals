@@ -6,6 +6,8 @@ function StoreNavbar({
   onLogout,
   onOpenAdmin,
   onNavigate,
+  navLinks,
+  onNavItemClick,
   secondaryActionLabel = 'Admin Panel',
   cartCount = 0,
   orderCount = 0,
@@ -15,14 +17,19 @@ function StoreNavbar({
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const links = [
+  const defaultLinks = [
     { label: 'Collections', route: 'home-collections' },
     { label: 'About the Brand', route: 'home-brand' },
     { label: 'Customer Care', route: 'home-care' },
   ]
+  const links = navLinks ?? defaultLinks
 
   const handleNavigate = (route) => {
-    onNavigate?.(route)
+    if (onNavItemClick) {
+      onNavItemClick(route)
+    } else {
+      onNavigate?.(route)
+    }
     setIsMenuOpen(false)
   }
 
