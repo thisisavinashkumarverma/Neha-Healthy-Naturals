@@ -11,6 +11,7 @@ function StoreNavbar({
   orderCount = 0,
   showCartShortcut = true,
   showOrdersShortcut = true,
+  showSecondaryAction = true,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -88,9 +89,11 @@ function StoreNavbar({
               <span className="store-navbar__cart-count">{cartCount}</span>
             </button>
           )}
-          <button type="button" onClick={handleSecondaryAction}>
-            {secondaryActionLabel}
-          </button>
+          {showSecondaryAction && (
+            <button type="button" onClick={handleSecondaryAction}>
+              {secondaryActionLabel}
+            </button>
+          )}
           <button type="button" className="store-navbar__logout" onClick={handleLogout}>
             Logout
           </button>

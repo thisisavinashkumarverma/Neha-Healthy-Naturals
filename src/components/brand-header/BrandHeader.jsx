@@ -5,15 +5,12 @@ function BrandHeader({
   onLoginClick,
   onSignupClick,
   onNavigate,
+  isAuthenticated = false,
   compact = false,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const links = [
-    { label: 'Our Collection', route: 'landing-collections' },
-    { label: 'Our Story', route: 'landing-story' },
-    { label: 'Contact Us', route: 'landing-contact' },
-  ]
+  const links = isAuthenticated ? [{ label: 'Our Collection', route: 'landing-collections' }] : []
 
   const handleNavigate = (route) => {
     onNavigate?.(route)
@@ -32,6 +29,16 @@ function BrandHeader({
 
   const handleSignup = () => {
     onSignupClick?.()
+    setIsMenuOpen(false)
+  }
+
+  const handleStoreHome = () => {
+    onNavigate?.('home')
+    setIsMenuOpen(false)
+  }
+
+  const handleMyOrders = () => {
+    onNavigate?.('home-orders')
     setIsMenuOpen(false)
   }
 
@@ -76,12 +83,25 @@ function BrandHeader({
         </nav>
 
         <div className="brand-header__actions">
-          <button type="button" className="brand-header__button brand-header__button--ghost" onClick={handleLogin}>
-            Login
-          </button>
-          <button type="button" className="brand-header__button" onClick={handleSignup}>
-            Sign Up
-          </button>
+          {isAuthenticated ? (
+            <>
+              <button type="button" className="brand-header__button brand-header__button--ghost" onClick={handleMyOrders}>
+                My Orders
+              </button>
+              <button type="button" className="brand-header__button" onClick={handleStoreHome}>
+                Store Home
+              </button>
+            </>
+          ) : (
+            <>
+              <button type="button" className="brand-header__button brand-header__button--ghost" onClick={handleLogin}>
+                Login
+              </button>
+              <button type="button" className="brand-header__button" onClick={handleSignup}>
+                Sign Up
+              </button>
+            </>
+          )}
         </div>
       </div>
     </header>

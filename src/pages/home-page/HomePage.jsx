@@ -8,7 +8,7 @@ import './HomePage.css'
 const aboutItems = [
   { title: 'Farm-Led Sourcing', description: 'Traceable procurement and freshness-focused processing for every spice batch.' },
   { title: 'Single-Vendor Trust', description: 'One brand, one quality standard, and one seamless customer care experience.' },
-  { title: 'Retail-Ready Packaging', description: 'Photogenic, premium packs designed for modern kitchens and shelves.' },
+  { title: 'Retail-Ready Packaging', description: 'Premium packs designed for modern kitchens and shelves.' },
 ]
 
 const contactItems = [
@@ -95,7 +95,7 @@ function HomePage({
       <div className="home-page__catalog-top">
         <div>
           <span className="home-page__eyebrow">Spice Marketplace</span>
-          <h2>Browse photogenic packs, premium blends, and daily kitchen essentials.</h2>
+          <h2>Browse premium packs, refined blends, and daily kitchen essentials.</h2>
         </div>
         <p>Search by product, filter by collection, and sort your selection before adding items to the cart.</p>
       </div>
@@ -406,7 +406,7 @@ function HomePage({
         <div className="home-page__panel-heading">
           <div>
             <span>Featured Collection</span>
-            <h3>Photogenic spotlight products for modern spice shopping.</h3>
+            <h3>Premium spotlight products for modern spice shopping.</h3>
           </div>
         </div>
         <div className="home-page__featured-list">
@@ -474,6 +474,7 @@ function HomePage({
           user={user}
           cartCount={cartCount}
           orderCount={orders.length}
+          showSecondaryAction={false}
           onLogout={onLogout}
           onNavigate={onNavigate}
           onOpenAdmin={onOpenAdmin}

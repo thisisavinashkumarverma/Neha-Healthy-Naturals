@@ -308,6 +308,7 @@ function App() {
           onNavigate={navigate}
           onLoginClick={() => navigate('login')}
           onSignupClick={() => navigate('signup')}
+          isAuthenticated={isAuthenticated && currentUser.role === 'customer'}
         />
       )}
 

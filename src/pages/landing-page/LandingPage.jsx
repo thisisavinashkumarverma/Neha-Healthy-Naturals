@@ -1,5 +1,6 @@
 import BrandHeader from '../../components/brand-header/BrandHeader'
 import SiteFooter from '../../components/site-footer/SiteFooter'
+import { initialProducts } from '../../data/catalog'
 import './LandingPage.css'
 
 const collectionCards = [
@@ -20,9 +21,11 @@ const collectionCards = [
   },
 ]
 
+const guestProducts = initialProducts
+
 const experiencePoints = [
   'Single-vendor quality control across sourcing, blending, and packing',
-  'Photogenic premium packaging designed for shelves, gifting, and digital storefronts',
+  'Premium packaging designed for shelves, gifting, and digital storefronts',
   'Fast support for individual customers, wholesale buyers, and institutional orders',
 ]
 
@@ -43,11 +46,16 @@ const testimonials = [
   },
 ]
 
-function LandingPage({ onNavigate, onLoginClick, onSignupClick }) {
+function LandingPage({ onNavigate, onLoginClick, onSignupClick, isAuthenticated = false }) {
   return (
     <main className="landing-page">
       <div className="landing-page__container">
-        <BrandHeader onNavigate={onNavigate} onLoginClick={onLoginClick} onSignupClick={onSignupClick} />
+        <BrandHeader
+          onNavigate={onNavigate}
+          onLoginClick={onLoginClick}
+          onSignupClick={onSignupClick}
+          isAuthenticated={isAuthenticated}
+        />
 
         <section className="landing-page__hero">
           <div className="landing-page__hero-copy">
@@ -60,12 +68,25 @@ function LandingPage({ onNavigate, onLoginClick, onSignupClick }) {
             </p>
 
             <div className="landing-page__hero-actions">
-              <button type="button" className="landing-page__primary-button" onClick={onSignupClick}>
-                Start Shopping
-              </button>
-              <button type="button" className="landing-page__secondary-button" onClick={onLoginClick}>
-                Customer Login
-              </button>
+              {isAuthenticated ? (
+                <>
+                  <button type="button" className="landing-page__primary-button" onClick={() => onNavigate('home')}>
+                    Go to Store
+                  </button>
+                  <button type="button" className="landing-page__secondary-button" onClick={() => onNavigate('home-orders')}>
+                    View My Orders
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="landing-page__primary-button" onClick={onSignupClick}>
+                    Start Shopping
+                  </button>
+                  <button type="button" className="landing-page__secondary-button" onClick={onLoginClick}>
+                    Customer Login
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="landing-page__hero-trust">
@@ -111,10 +132,10 @@ function LandingPage({ onNavigate, onLoginClick, onSignupClick }) {
         <section className="landing-page__collections">
           <div className="landing-page__section-head">
             <span>Curated Collections</span>
-            <h2>A standalone landing page that sells the brand before it sells the catalog.</h2>
+            <h2>Guests can explore the full NHN collection before signing in.</h2>
             <p>
-              Instead of exposing other screens, this homepage stays focused on premium brand positioning, strong
-              product framing, and clear action paths into login or signup.
+              We surface all core products on the public landing page, but protected actions like adding items to cart
+              will guide customers into login first.
             </p>
           </div>
 
@@ -123,6 +144,32 @@ function LandingPage({ onNavigate, onLoginClick, onSignupClick }) {
               <article key={card.title} className={`landing-page__collection-card landing-page__collection-card--${card.accent}`}>
                 <strong>{card.title}</strong>
                 <p>{card.description}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="landing-page__guest-products">
+            {guestProducts.map((product) => (
+              <article key={product.id} className="landing-page__guest-card">
+                <div className="landing-page__guest-image">
+                  <img src={product.image} alt={product.name} />
+                </div>
+                <div className="landing-page__guest-content">
+                  <span>{product.badge}</span>
+                  <h3>{product.name}</h3>
+                  <p>{product.shortDescription}</p>
+                  <div className="landing-page__guest-meta">
+                    <strong>Rs {product.price}</strong>
+                    <small>{product.size}</small>
+                  </div>
+                  <button
+                    type="button"
+                    className="landing-page__primary-button"
+                    onClick={isAuthenticated ? () => onNavigate('home') : onLoginClick}
+                  >
+                    {isAuthenticated ? 'Open Store to Add' : 'Login to Add to Cart'}
+                  </button>
+                </div>
               </article>
             ))}
           </div>
@@ -153,7 +200,7 @@ function LandingPage({ onNavigate, onLoginClick, onSignupClick }) {
         <section className="landing-page__testimonials">
           <div className="landing-page__section-head">
             <span>Brand Impression</span>
-            <h2>A photogenic first impression that feels premium on desktop and mobile.</h2>
+            <h2>A polished first impression that feels premium on desktop and mobile.</h2>
           </div>
           <div className="landing-page__testimonial-grid">
             {testimonials.map((item) => (
@@ -171,12 +218,25 @@ function LandingPage({ onNavigate, onLoginClick, onSignupClick }) {
             <h2>Move from premium brand discovery into a full NHN ecommerce experience.</h2>
           </div>
           <div className="landing-page__cta-actions">
-            <button type="button" className="landing-page__primary-button" onClick={onSignupClick}>
-              Create Customer Account
-            </button>
-            <button type="button" className="landing-page__secondary-button" onClick={onLoginClick}>
-              Login to Dashboard
-            </button>
+            {isAuthenticated ? (
+              <>
+                <button type="button" className="landing-page__primary-button" onClick={() => onNavigate('home')}>
+                  Enter Storefront
+                </button>
+                <button type="button" className="landing-page__secondary-button" onClick={() => onNavigate('home-orders')}>
+                  Open My Orders
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="landing-page__primary-button" onClick={onSignupClick}>
+                  Create Customer Account
+                </button>
+                <button type="button" className="landing-page__secondary-button" onClick={onLoginClick}>
+                  Login to Dashboard
+                </button>
+              </>
+            )}
           </div>
         </section>
 

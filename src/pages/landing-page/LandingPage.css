@@ -205,10 +205,18 @@
   margin-top: 1.2rem;
 }
 
+.landing-page__guest-products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
 .landing-page__collection-card,
 .landing-page__testimonial-card,
 .landing-page__story-card,
-.landing-page__timeline article {
+.landing-page__timeline article,
+.landing-page__guest-card {
   border-radius: 24px;
 }
 
@@ -299,6 +307,63 @@
   color: #8e481d;
 }
 
+.landing-page__guest-card {
+  overflow: hidden;
+  border: 1px solid rgba(126, 93, 55, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.landing-page__guest-image {
+  padding: 1rem;
+  background: linear-gradient(180deg, #fff7ee 0%, #f5e3cf 100%);
+}
+
+.landing-page__guest-image img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+.landing-page__guest-content {
+  padding: 1.1rem;
+}
+
+.landing-page__guest-content span {
+  display: inline-block;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(142, 63, 23, 0.08);
+  color: #8e481d;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.landing-page__guest-content h3 {
+  margin: 0.85rem 0 0.45rem;
+  color: #2f241c;
+}
+
+.landing-page__guest-content p {
+  color: #6c5a48;
+}
+
+.landing-page__guest-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin: 0.95rem 0 1rem;
+}
+
+.landing-page__guest-meta strong {
+  color: #8e481d;
+}
+
+.landing-page__guest-meta small {
+  color: #7b6a58;
+}
+
 .landing-page__cta {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -332,7 +397,8 @@
   .landing-page__cta,
   .landing-page__stats,
   .landing-page__collection-grid,
-  .landing-page__testimonial-grid {
+  .landing-page__testimonial-grid,
+  .landing-page__guest-products {
     grid-template-columns: 1fr;
   }
 

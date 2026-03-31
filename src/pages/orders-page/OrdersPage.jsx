@@ -12,6 +12,7 @@ function OrdersPage({ user, orders, cartCount, onLogout, onNavigate, onOpenAdmin
           user={user}
           cartCount={cartCount}
           orderCount={orders.length}
+          showSecondaryAction={false}
           onLogout={onLogout}
           onNavigate={onNavigate}
           onOpenAdmin={onOpenAdmin}
