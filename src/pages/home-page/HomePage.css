@@ -1,10 +1,75 @@
 .home-page {
   padding: 1.25rem;
+  position: relative;
+  overflow: clip;
 }
 
 .home-page__container {
   width: min(1240px, 100%);
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.home-page__background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.home-page__background::before,
+.home-page__background::after {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(20px);
+  opacity: 0.55;
+}
+
+.home-page__background::before {
+  top: 7rem;
+  left: -6rem;
+  width: 18rem;
+  height: 18rem;
+  background: radial-gradient(circle, rgba(204, 126, 39, 0.24), rgba(204, 126, 39, 0));
+}
+
+.home-page__background::after {
+  right: -4rem;
+  top: 36rem;
+  width: 16rem;
+  height: 16rem;
+  background: radial-gradient(circle, rgba(142, 63, 23, 0.18), rgba(142, 63, 23, 0));
+}
+
+.home-page__background-art {
+  position: absolute;
+  width: 14rem;
+  aspect-ratio: 1 / 1;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.12;
+  border-radius: 28px;
+  transform: rotate(-10deg);
+  filter: saturate(1.1) blur(0.2px);
+}
+
+.home-page__background-art--1 {
+  top: 9rem;
+  right: -2rem;
+}
+
+.home-page__background-art--2 {
+  top: 28rem;
+  left: -3rem;
+  transform: rotate(14deg);
+}
+
+.home-page__background-art--3 {
+  bottom: 14rem;
+  right: 1rem;
+  transform: rotate(-6deg);
 }
 
 .home-page__hero,

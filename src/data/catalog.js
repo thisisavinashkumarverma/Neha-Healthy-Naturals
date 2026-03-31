@@ -1,9 +1,9 @@
-import turmericImage from '../assets/products/turmeric-gold.svg'
-import garamMasalaImage from '../assets/products/royal-garam-masala.svg'
-import corianderImage from '../assets/products/coriander-crush.svg'
-import chiliImage from '../assets/products/kashmiri-chili.svg'
-import cuminImage from '../assets/products/roasted-cumin.svg'
-import pepperImage from '../assets/products/black-pepper.svg'
+import turmericImage from '../assets/products/turmeric-gold.avif'
+import garamMasalaImage from '../assets/products/royal-garam-masala.webp'
+import corianderImage from '../assets/products/coriander-crush.webp'
+import chiliImage from '../assets/products/kashmiri-chili.avif'
+import cuminImage from '../assets/products/roasted-cumin.avif'
+import pepperImage from '../assets/products/black-pepper.avif'
 
 export const initialProducts = [
   {

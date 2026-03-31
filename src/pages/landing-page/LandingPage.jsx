@@ -44,6 +44,13 @@ const testimonials = [
 ]
 
 function LandingPage({ products = [], onNavigate, onLoginClick, onSignupClick, isAuthenticated = false }) {
+  const heroImages = [
+    products[0]?.image,
+    products[1]?.image,
+    products[2]?.image,
+    products[3]?.image,
+  ].filter(Boolean)
+
   return (
     <main className="landing-page">
       <div className="landing-page__container">
@@ -94,15 +101,26 @@ function LandingPage({ products = [], onNavigate, onLoginClick, onSignupClick, i
           </div>
 
           <div className="landing-page__hero-visual">
+            <div className="landing-page__hero-collage">
+              {heroImages.map((image, index) => (
+                <img
+                  key={image}
+                  className={`landing-page__hero-art landing-page__hero-art--${index + 1}`}
+                  src={image}
+                  alt=""
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
             <div className="landing-page__jar landing-page__jar--front">
               <small>Best Seller</small>
               <strong>Royal Spice Collection</strong>
-              <p>Curated blend series for modern Indian kitchens and premium gifting.</p>
+              <p>Curated blend series built from the actual NHN catalog visuals.</p>
             </div>
             <div className="landing-page__jar landing-page__jar--back">
-              <span>Flavor</span>
-              <span>Freshness</span>
-              <span>Presentation</span>
+              <span>Turmeric Gold</span>
+              <span>Royal Garam Masala</span>
+              <span>Kashmiri Chili</span>
             </div>
           </div>
         </section>

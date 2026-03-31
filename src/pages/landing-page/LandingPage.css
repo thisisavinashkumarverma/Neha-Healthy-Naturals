@@ -128,11 +128,52 @@
   overflow: hidden;
 }
 
+.landing-page__hero-collage {
+  position: absolute;
+  inset: 0;
+}
+
+.landing-page__hero-art {
+  position: absolute;
+  width: 42%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 28px;
+  box-shadow: 0 22px 48px rgba(45, 24, 12, 0.22);
+  opacity: 0.9;
+  border: 1px solid rgba(255, 248, 240, 0.18);
+}
+
+.landing-page__hero-art--1 {
+  top: 10%;
+  left: 8%;
+  transform: rotate(-10deg);
+}
+
+.landing-page__hero-art--2 {
+  top: 8%;
+  right: 9%;
+  transform: rotate(8deg);
+}
+
+.landing-page__hero-art--3 {
+  bottom: 10%;
+  left: 17%;
+  transform: rotate(6deg);
+}
+
+.landing-page__hero-art--4 {
+  bottom: 8%;
+  right: 14%;
+  transform: rotate(-7deg);
+}
+
 .landing-page__jar {
   position: absolute;
   padding: 1.4rem;
   border-radius: 26px;
   box-shadow: 0 22px 46px rgba(45, 24, 12, 0.18);
+  backdrop-filter: blur(10px);
 }
 
 .landing-page__jar--front {
@@ -419,6 +460,11 @@
   .landing-page__hero-visual {
     min-height: 340px;
     border-radius: 24px;
+  }
+
+  .landing-page__hero-art {
+    width: 48%;
+    border-radius: 20px;
   }
 
   .landing-page__jar--front {

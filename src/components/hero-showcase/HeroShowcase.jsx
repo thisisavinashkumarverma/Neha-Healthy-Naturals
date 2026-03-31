@@ -7,7 +7,9 @@ const spiceNotes = [
   'Export-grade garam masala',
 ]
 
-function HeroShowcase({ onLoginClick, onSignupClick }) {
+function HeroShowcase({ onLoginClick, onSignupClick, products = [] }) {
+  const heroImages = [products[0]?.image, products[1]?.image, products[2]?.image].filter(Boolean)
+
   return (
     <section className="hero-showcase">
       <div className="hero-showcase__content">
@@ -35,10 +37,20 @@ function HeroShowcase({ onLoginClick, onSignupClick }) {
       </div>
 
       <div className="hero-showcase__card">
+        <div className="hero-showcase__collage" aria-hidden="true">
+          {heroImages.map((image, index) => (
+            <img
+              key={image}
+              className={`hero-showcase__art hero-showcase__art--${index + 1}`}
+              src={image}
+              alt=""
+            />
+          ))}
+        </div>
         <div className="hero-showcase__spotlight">
           <p>Best Seller Mix</p>
           <strong>Royal Spice Collection</strong>
-          <span>Turmeric, paprika, cumin, cinnamon and handpicked botanicals</span>
+          <span>Visuals pulled from the NHN catalog, not placeholders.</span>
         </div>
 
         <div className="hero-showcase__stats">

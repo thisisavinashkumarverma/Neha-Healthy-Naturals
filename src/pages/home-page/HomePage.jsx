@@ -89,6 +89,11 @@ function HomePage({
   const featuredProducts = products.filter((product) => product.featured)
   const selectedProduct =
     products.find((product) => product.id === selectedProductId) ?? filteredProducts[0] ?? products[0]
+  const backgroundImages = [
+    products[0]?.image,
+    products[1]?.image,
+    products[3]?.image,
+  ].filter(Boolean)
 
   const renderCatalog = () => (
     <section className="home-page__catalog">
@@ -469,6 +474,15 @@ function HomePage({
 
   return (
     <main className="home-page">
+      <div className="home-page__background" aria-hidden="true">
+        {backgroundImages.map((image, index) => (
+          <span
+            key={image}
+            className={`home-page__background-art home-page__background-art--${index + 1}`}
+            style={{ backgroundImage: `url(${image})` }}
+          />
+        ))}
+      </div>
       <div className="home-page__container">
         <StoreNavbar
           user={user}
