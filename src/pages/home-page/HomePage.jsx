@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useState } from 'react'
 import StoreNavbar from '../../components/store-navbar/StoreNavbar'
 import InfoSection from '../../components/info-section/InfoSection'
 import SiteFooter from '../../components/site-footer/SiteFooter'
@@ -34,61 +33,22 @@ function HomePage({
   onOpenCart,
   onOpenOrders,
 }) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('All')
-  const [sortBy, setSortBy] = useState('featured')
-  const [selectedProductId, setSelectedProductId] = useState(products[0]?.id ?? null)
-
-  useEffect(() => {
-    if (!products.find((product) => product.id === selectedProductId)) {
-      setSelectedProductId(products[0]?.id ?? null)
+  const cartDetails = cartItems.map((item) => {
+    const product = products.find((entry) => entry.id === item.productId)
+    return {
+      ...item,
+      product,
+      subtotal: (product?.price ?? 0) * item.quantity,
     }
-  }, [products, selectedProductId])
-
-  const cartDetails = useMemo(
-    () =>
-      cartItems.map((item) => {
-        const product = products.find((entry) => entry.id === item.productId)
-        return {
-          ...item,
-          product,
-          subtotal: (product?.price ?? 0) * item.quantity,
-        }
-      }),
-    [cartItems, products],
-  )
+  })
 
   const cartSubtotal = cartDetails.reduce((sum, item) => sum + item.subtotal, 0)
   const shippingCharge = cartSubtotal > 0 ? 90 : 0
   const grandTotal = cartSubtotal + shippingCharge
 
-  const filteredProducts = useMemo(() => {
-    const base = products.filter((product) => {
-      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory
-      const query = searchTerm.trim().toLowerCase()
-      const matchesSearch =
-        !query ||
-        product.name.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
-
-      return matchesCategory && matchesSearch
-    })
-
-    const sorted = [...base]
-
-    if (sortBy === 'price-low') sorted.sort((a, b) => a.price - b.price)
-    if (sortBy === 'price-high') sorted.sort((a, b) => b.price - a.price)
-    if (sortBy === 'rating') sorted.sort((a, b) => b.rating - a.rating)
-    if (sortBy === 'newest') sorted.sort((a, b) => Number(b.featured) - Number(a.featured))
-    if (sortBy === 'featured') sorted.sort((a, b) => Number(b.featured) - Number(a.featured) || b.rating - a.rating)
-
-    return sorted
-  }, [products, searchTerm, selectedCategory, sortBy])
-
+  const filteredProducts = products
   const featuredProducts = products.filter((product) => product.featured)
-  const selectedProduct =
-    products.find((product) => product.id === selectedProductId) ?? filteredProducts[0] ?? products[0]
+  const selectedProduct = featuredProducts[0] ?? filteredProducts[0] ?? products[0]
   const backgroundImages = [
     products[0]?.image,
     products[1]?.image,
@@ -110,11 +70,9 @@ function HomePage({
           type="search"
           className="home-page__search"
           placeholder="Search spices, blends, and premium collections"
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
         />
 
-        <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+        <select defaultValue="featured">
           <option value="featured">Sort: Featured</option>
           <option value="price-low">Sort: Price Low to High</option>
           <option value="price-high">Sort: Price High to Low</option>
@@ -128,8 +86,7 @@ function HomePage({
           <button
             key={category}
             type="button"
-            className={`home-page__chip ${selectedCategory === category ? 'home-page__chip--active' : ''}`}
-            onClick={() => setSelectedCategory(category)}
+            className={`home-page__chip ${category === 'All' ? 'home-page__chip--active' : ''}`}
           >
             {category}
           </button>
@@ -149,7 +106,7 @@ function HomePage({
                 <div className="home-page__product-content">
                   <div className="home-page__product-topline">
                     <span>{product.badge}</span>
-                    <button type="button" onClick={() => onToggleWishlist(product.id)}>
+                    <button type="button" onClick={() => onToggleWishlist?.(product.id)}>
                       {isWishlisted ? 'Saved' : 'Wishlist'}
                     </button>
                   </div>
@@ -161,10 +118,10 @@ function HomePage({
                     <span>{product.rating} / 5</span>
                   </div>
                   <div className="home-page__product-actions">
-                    <button type="button" onClick={() => setSelectedProductId(product.id)}>
+                    <button type="button">
                       View Details
                     </button>
-                    <button type="button" className="home-page__primary-button" onClick={() => onAddToCart(product.id)}>
+                    <button type="button" className="home-page__primary-button" onClick={() => onAddToCart?.(product.id)}>
                       Add to Cart
                     </button>
                   </div>
@@ -192,10 +149,10 @@ function HomePage({
               ))}
             </ul>
             <div className="home-page__detail-actions">
-              <button type="button" className="home-page__primary-button" onClick={() => onAddToCart(selectedProduct.id)}>
+              <button type="button" className="home-page__primary-button" onClick={() => onAddToCart?.(selectedProduct.id)}>
                 Add to Cart
               </button>
-              <button type="button" onClick={() => onToggleWishlist(selectedProduct.id)}>
+              <button type="button" onClick={() => onToggleWishlist?.(selectedProduct.id)}>
                 {wishlist.includes(selectedProduct.id) ? 'Remove Wishlist' : 'Save to Wishlist'}
               </button>
             </div>
@@ -225,9 +182,9 @@ function HomePage({
                 <strong>{product?.name}</strong>
                 <p>{product?.size}</p>
                 <div className="home-page__qty">
-                  <button type="button" onClick={() => onUpdateCartQuantity(product.id, quantity - 1)}>-</button>
+                  <button type="button" onClick={() => onUpdateCartQuantity?.(product.id, quantity - 1)}>-</button>
                   <span>{quantity}</span>
-                  <button type="button" onClick={() => onUpdateCartQuantity(product.id, quantity + 1)}>+</button>
+                  <button type="button" onClick={() => onUpdateCartQuantity?.(product.id, quantity + 1)}>+</button>
                 </div>
               </div>
               <strong>Rs {subtotal}</strong>
@@ -361,7 +318,7 @@ function HomePage({
                 <strong>{product.name}</strong>
                 <p>{product.shortDescription}</p>
               </div>
-              <button type="button" className="home-page__primary-button" onClick={() => onAddToCart(product.id)}>
+              <button type="button" className="home-page__primary-button" onClick={() => onAddToCart?.(product.id)}>
                 Add
               </button>
             </article>
@@ -416,7 +373,7 @@ function HomePage({
         </div>
         <div className="home-page__featured-list">
           {featuredProducts.map((product) => (
-            <article key={product.id} className="home-page__featured-card" onClick={() => setSelectedProductId(product.id)}>
+            <article key={product.id} className="home-page__featured-card">
               <img src={product.image} alt={product.name} />
               <div>
                 <strong>{product.name}</strong>

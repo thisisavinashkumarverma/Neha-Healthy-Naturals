@@ -1,33 +1,73 @@
-import { useState } from 'react'
 import BrandHeader from '../../components/brand-header/BrandHeader'
-import AuthCard from '../../components/auth-card/AuthCard'
+// import AuthCard from '../../components/auth-card/AuthCard'
 import SiteFooter from '../../components/site-footer/SiteFooter'
 import './SignupPage.css'
+import { useAuth } from '../../context/AuthContext'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+function SignupPage({ onBack, onLoginLink, onNavigate }) {
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('')
+  const [form, setForm] = useState();
+  const [password, setPass] = useState();
+  const {reqOtpContext,verifyOtpContext,signupContext, otpStatus} = useAuth();
 
-function SignupPage({ onBack, onSignup, onLoginLink, onNavigate }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-  })
+  const navigate = useNavigate()
+  
 
-  const fields = [
-    { name: 'name', label: 'Full Name', type: 'text', placeholder: 'Enter your full name' },
-    { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter your email' },
-    { name: 'phone', label: 'Phone Number', type: 'text', placeholder: 'Enter your phone number' },
-    { name: 'password', label: 'Password', type: 'password', placeholder: 'Create a password' },
-  ]
+  const handleOtp = async(e)=>{
+    e.preventDefault();
+    await reqOtpContext({email});
+    localStorage.setItem("email", email);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setFormData((current) => ({ ...current, [name]: value }))
+
+  }
+  const handleEmail = (e)=>{
+  setEmail(e.target.value);
+ 
+ 
   }
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    onSignup(formData)
+  const handleOtpInput=(e)=>{
+    setOtp(e.target.value)
   }
+
+
+  const passHandle=(e)=>{
+    setPass(e.target.value);
+  }
+
+  const handleSignup =async(e)=>{
+    e.preventDefault();
+    await signupContext(password);
+    
+
+  }
+
+  const payload ={
+    email:email,
+    recOtp: otp
+  }
+  const handleVerify=async(e)=>{
+    e.preventDefault();
+    const res =await verifyOtpContext(payload)
+    console.log(res);
+  }
+
+
+  useEffect(()=>{
+    const email =localStorage.getItem("email");
+   
+    if(email){
+      setEmail(email);
+  
+    console.log(email)
+
+   
+  }
+  },[])
+
+
 
   return (
     <main className="signup-page">
@@ -35,20 +75,22 @@ function SignupPage({ onBack, onSignup, onLoginLink, onNavigate }) {
         <BrandHeader onNavigate={onNavigate} onLoginClick={onLoginLink} onSignupClick={() => {}} compact />
 
         <div className="signup-page__panel">
-          <AuthCard
-            title="Create your account"
-            subtitle="Join the NHN spice marketplace and unlock the personalized customer home page."
-            fields={fields}
-            formData={formData}
-            onChange={handleChange}
-            onSubmit={handleSubmit}
-            submitLabel="Create Account"
-            helperText="Already have an account?"
-            helperActionLabel="Login"
-            onHelperAction={onLoginLink}
-            onBack={onBack}
-          />
+          <div className='form-container'>
+         <form  >
+          <label >Email</label>
+          <input type='email'className="email" name='email' value={email.email} onChange={handleEmail}></input>
+          <button type='button'onClick={handleOtp}>request OTP</button>
+          <label>OTP</label>
+          <input type='text' placeholder='enter otp' name='recOtp' value={otp.recOtp} onChange={handleOtpInput}></input>
+          <button type='submit' onClick={handleVerify}>verify</button>
+          <label>Password</label>
+          <input type='password' onChange={passHandle}></input>
+          <p>{otpStatus}</p>
+          <button type='button' onClick={handleSignup}>Create Account</button>
+         </form>
 
+         <p>Already have an acc? <a onClick={()=>navigate("/login")}>Login</a></p>
+         </div>
           <div className="signup-page__content">
             <span>Healthy Spice Membership</span>
             <h2>Beautiful onboarding for customers who want trusted, natural spices.</h2>

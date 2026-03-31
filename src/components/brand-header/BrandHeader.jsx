@@ -9,7 +9,6 @@ function BrandHeader({
   compact = false,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-
   const links = isAuthenticated ? [{ label: 'Our Collection', route: 'landing-collections' }] : []
 
   const handleNavigate = (route) => {

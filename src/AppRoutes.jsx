@@ -8,10 +8,17 @@ import AdminPanel from './pages/admin-panel/AdminPanel'
 import CartPage from './pages/cart-page/CartPage'
 import OrdersPage from './pages/orders-page/OrdersPage'
 import PaymentPage from './pages/payment-page/PaymentPage'
-import { useAuth } from './context/AuthContext'
-import { createCheckoutDraftForUser, defaultUser } from './services/authservieces'
-import useShopState from './hooks/useShopState'
 import ProtectedRoute from './routes/ProtectedRoute'
+import {
+  sampleAdminUser,
+  sampleCartItems,
+  sampleCheckoutDraft,
+  sampleCustomerUser,
+  sampleOrders,
+  sampleProducts,
+  sampleStorefrontProducts,
+  sampleWishlist,
+} from './data/uiSamples'
 import {
   ADMIN_ROUTE_KEYS,
   CUSTOMER_HOME_ROUTE_KEYS,
@@ -24,90 +31,74 @@ import {
 } from './routes/routePaths'
 
 function AppRoutes() {
-  const { currentUser, isAuthenticated, login, signup, logout } = useAuth()
   const routerNavigate = useNavigate()
   const location = useLocation()
-  const shop = useShopState()
+  const cartCount = sampleCartItems.reduce((count, item) => count + item.quantity, 0)
 
   const navigate = (routeKey) => {
     routerNavigate(getRoutePath(routeKey))
   }
 
   const handleAdminEntry = () => {
-    navigate(currentUser.role === 'admin' ? 'admin-insights' : 'login')
+    navigate('admin-insights')
   }
 
-  const handleLogin = ({ name, email, role }) => {
-    const nextUser = login({ name, email, role })
-    shop.setCheckoutDraft(createCheckoutDraftForUser(nextUser))
-    navigate(nextUser.role === 'admin' ? 'admin-insights' : 'home')
-  }
-
-  const handleSignup = ({ name, email }) => {
-    const nextUser = signup({ name, email })
-    shop.setCheckoutDraft(createCheckoutDraftForUser(nextUser))
-    navigate('home')
+  const handleLogin = ({ role }) => {
+    navigate(role === 'admin' ? 'admin-insights' : 'home')
   }
 
   const handleLogout = () => {
-    logout()
-    shop.resetAfterLogout()
-    shop.setCheckoutDraft(createCheckoutDraftForUser(defaultUser))
     navigate('landing')
   }
 
-  const handleStartCheckout = (details) => {
-    shop.handleStartCheckout(details)
+  const handleStartCheckout = () => {
     navigate('home-payment')
   }
 
-  const handlePlaceOrder = (paymentPayload) => {
-    const orderId = shop.handlePlaceOrder(paymentPayload)
-    if (orderId) {
-      navigate('home-orders')
-    }
+  const handlePlaceOrder = () => {
+    navigate('home-orders')
   }
 
   const landingPageProps = {
     activeSection: getLandingSectionFromPath(location.pathname),
-    products: shop.storefrontProducts,
+    products: sampleStorefrontProducts,
     onNavigate: navigate,
     onLoginClick: () => navigate('login'),
     onSignupClick: () => navigate('signup'),
-    isAuthenticated: isAuthenticated && currentUser.role === 'customer',
+    isAuthenticated: false,
   }
 
   const customerHomeProps = {
     activeSection: getHomeSectionFromPath(location.pathname),
-    user: currentUser,
-    products: shop.storefrontProducts,
-    cartItems: shop.cartItems,
-    wishlist: shop.wishlist,
-    orders: shop.orders,
-    cartCount: shop.cartCount,
+    user: sampleCustomerUser,
+    products: sampleStorefrontProducts,
+    cartItems: sampleCartItems,
+    wishlist: sampleWishlist,
+    orders: sampleOrders,
+    cartCount,
     onLogout: handleLogout,
     onNavigate: navigate,
     onOpenAdmin: handleAdminEntry,
-    onAddToCart: shop.handleAddToCart,
-    onToggleWishlist: shop.handleToggleWishlist,
-    onUpdateCartQuantity: shop.handleUpdateCartQuantity,
+    onAddToCart: undefined,
+    onToggleWishlist: undefined,
+    onUpdateCartQuantity: undefined,
     onOpenCart: () => navigate('home-cart'),
     onOpenOrders: () => navigate('home-orders'),
   }
 
   const adminPanelProps = {
     activeSection: getAdminSectionFromPath(location.pathname),
-    user: currentUser,
-    products: shop.products,
-    orders: shop.orders,
+    user: sampleAdminUser,
+    products: sampleProducts,
+    orders: sampleOrders,
     onLogout: handleLogout,
     onNavigate: navigate,
     onOpenStore: () => navigate('home'),
-    onAdjustInventory: shop.handleAdjustInventory,
-    onToggleFeatured: shop.handleToggleFeatured,
-    onAddProduct: shop.handleAddProduct,
-    onTogglePublish: shop.handleTogglePublish,
-    onUpdateOrderStatus: shop.handleUpdateOrderStatus,
+    onAdjustInventory: undefined,
+    onToggleFeatured: undefined,
+    onAddProduct: undefined,
+    onTogglePublish: undefined,
+    onUpdateOrderStatus: undefined,
   }
 
   return (
@@ -134,7 +125,6 @@ function AppRoutes() {
           element={
             <SignupPage
               onBack={() => navigate('landing')}
-              onSignup={handleSignup}
               onLoginLink={() => navigate('login')}
               onNavigate={navigate}
             />
@@ -146,7 +136,7 @@ function AppRoutes() {
             key={routeKey}
             path={getRoutePath(routeKey)}
             element={
-              <ProtectedRoute allow={isAuthenticated && currentUser.role === 'customer'} redirectTo={ROUTE_PATHS.login}>
+              <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
                 <HomePage {...customerHomeProps} />
               </ProtectedRoute>
             }
@@ -156,18 +146,18 @@ function AppRoutes() {
         <Route
           path={ROUTE_PATHS['home-cart']}
           element={
-            <ProtectedRoute allow={isAuthenticated && currentUser.role === 'customer'} redirectTo={ROUTE_PATHS.login}>
+            <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
               <CartPage
-                user={currentUser}
-                products={shop.storefrontProducts}
-                cartItems={shop.cartItems}
-                checkoutDraft={shop.checkoutDraft}
-                cartCount={shop.cartCount}
-                orders={shop.orders}
+                user={sampleCustomerUser}
+                products={sampleStorefrontProducts}
+                cartItems={sampleCartItems}
+                checkoutDraft={sampleCheckoutDraft}
+                cartCount={cartCount}
+                orders={sampleOrders}
                 onLogout={handleLogout}
                 onNavigate={navigate}
                 onOpenAdmin={handleAdminEntry}
-                onUpdateCartQuantity={shop.handleUpdateCartQuantity}
+                onUpdateCartQuantity={undefined}
                 onStartCheckout={handleStartCheckout}
               />
             </ProtectedRoute>
@@ -177,15 +167,15 @@ function AppRoutes() {
         <Route
           path={ROUTE_PATHS['home-orders']}
           element={
-            <ProtectedRoute allow={isAuthenticated && currentUser.role === 'customer'} redirectTo={ROUTE_PATHS.login}>
+            <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
               <OrdersPage
-                user={currentUser}
-                orders={shop.orders}
-                cartCount={shop.cartCount}
+                user={sampleCustomerUser}
+                orders={sampleOrders}
+                cartCount={cartCount}
                 onLogout={handleLogout}
                 onNavigate={navigate}
                 onOpenAdmin={handleAdminEntry}
-                onCancelOrder={shop.handleCancelOrder}
+                onCancelOrder={undefined}
               />
             </ProtectedRoute>
           }
@@ -194,14 +184,14 @@ function AppRoutes() {
         <Route
           path={ROUTE_PATHS['home-payment']}
           element={
-            <ProtectedRoute allow={isAuthenticated && currentUser.role === 'customer'} redirectTo={ROUTE_PATHS.login}>
+            <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
               <PaymentPage
-                user={currentUser}
-                products={shop.storefrontProducts}
-                cartItems={shop.cartItems}
-                checkoutDraft={shop.checkoutDraft}
-                cartCount={shop.cartCount}
-                orders={shop.orders}
+                user={sampleCustomerUser}
+                products={sampleStorefrontProducts}
+                cartItems={sampleCartItems}
+                checkoutDraft={sampleCheckoutDraft}
+                cartCount={cartCount}
+                orders={sampleOrders}
                 onLogout={handleLogout}
                 onNavigate={navigate}
                 onOpenAdmin={handleAdminEntry}
@@ -217,7 +207,7 @@ function AppRoutes() {
             key={routeKey}
             path={getRoutePath(routeKey)}
             element={
-              <ProtectedRoute allow={isAuthenticated && currentUser.role === 'admin'} redirectTo={ROUTE_PATHS.login}>
+              <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
                 <AdminPanel {...adminPanelProps} />
               </ProtectedRoute>
             }
@@ -226,8 +216,6 @@ function AppRoutes() {
 
         <Route path="*" element={<LandingPage {...landingPageProps} />} />
       </Routes>
-
-      {shop.toastMessage && <div className="app-toast">{shop.toastMessage}</div>}
     </div>
   )
 }

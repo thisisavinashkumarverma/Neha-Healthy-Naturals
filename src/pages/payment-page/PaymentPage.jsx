@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react'
 import StoreNavbar from '../../components/store-navbar/StoreNavbar'
 import SiteFooter from '../../components/site-footer/SiteFooter'
 import './PaymentPage.css'
@@ -23,29 +22,20 @@ function PaymentPage({
   onBackToCart,
   onPlaceOrder,
 }) {
-  const [paymentMethod, setPaymentMethod] = useState('upi')
-  const [paymentDetails, setPaymentDetails] = useState({
+  const paymentMethod = 'upi'
+  const paymentDetails = {
     upiApp: 'gpay',
-    upiId: '',
-    cardName: '',
-    cardNumber: '',
-    expiry: '',
-    cvv: '',
-  })
-  const [upiRequestSent, setUpiRequestSent] = useState(false)
+    upiId: 'neha.customer@okaxis',
+  }
 
-  const cartDetails = useMemo(
-    () =>
-      cartItems.map((item) => {
-        const product = products.find((entry) => entry.id === item.productId)
-        return {
-          ...item,
-          product,
-          subtotal: (product?.price ?? 0) * item.quantity,
-        }
-      }),
-    [cartItems, products],
-  )
+  const cartDetails = cartItems.map((item) => {
+    const product = products.find((entry) => entry.id === item.productId)
+    return {
+      ...item,
+      product,
+      subtotal: (product?.price ?? 0) * item.quantity,
+    }
+  })
 
   const subtotal = cartDetails.reduce((sum, item) => sum + item.subtotal, 0)
   const shipping = subtotal > 0 ? 90 : 0
@@ -57,21 +47,9 @@ function PaymentPage({
     merchantName,
   )}&am=${total}&cu=INR&tn=${encodeURIComponent(`NHN order payment by ${checkoutDraft.customerName}`)}`
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setPaymentDetails((current) => ({ ...current, [name]: value }))
-
-    if (name === 'upiApp' || name === 'upiId') {
-      setUpiRequestSent(false)
-    }
-  }
-
-  const handleSendUpiRequest = () => {
-    setUpiRequestSent(true)
-  }
-
   const handlePayment = (event) => {
     event.preventDefault()
+    const formValues = Object.fromEntries(new FormData(event.currentTarget).entries())
 
     const paidAt = new Date().toLocaleString('en-IN', {
       day: '2-digit',
@@ -82,36 +60,18 @@ function PaymentPage({
     })
     const transactionId = `PAY-${Date.now()}`
 
-    const label =
-      paymentMethod === 'upi'
-        ? `UPI • ${selectedUpiApp?.label ?? 'UPI'}`
-        : `Card • ${paymentDetails.cardNumber.slice(-4) || 'XXXX'}`
-
-    const paymentSummary =
-      paymentMethod === 'upi'
-        ? {
-            status: 'Paid',
-            amount: total,
-            app: selectedUpiApp?.label ?? 'UPI',
-            upiId: paymentDetails.upiId,
-            merchantUpiId,
-            transactionId,
-            paidAt,
-          }
-        : {
-            status: 'Paid',
-            amount: total,
-            app: 'Card Payment',
-            cardHolder: paymentDetails.cardName,
-            last4: paymentDetails.cardNumber.slice(-4),
-            transactionId,
-            paidAt,
-          }
-
-    onPlaceOrder({
+    onPlaceOrder?.({
       paymentMethod,
-      paymentLabel: label,
-      paymentDetails: paymentSummary,
+      paymentLabel: `UPI � ${selectedUpiApp?.label ?? 'UPI'}`,
+      paymentDetails: {
+        status: 'Paid',
+        amount: total,
+        app: selectedUpiApp?.label ?? 'UPI',
+        upiId: formValues.upiId || paymentDetails.upiId,
+        merchantUpiId,
+        transactionId,
+        paidAt,
+      },
     })
   }
 
@@ -190,96 +150,47 @@ function PaymentPage({
             </div>
 
             <div className="payment-page__method-switch">
-              <button
-                type="button"
-                className={
-                  paymentMethod === 'upi'
-                    ? 'payment-page__method-button payment-page__method-button--active'
-                    : 'payment-page__method-button'
-                }
-                onClick={() => setPaymentMethod('upi')}
-              >
+              <button type="button" className="payment-page__method-button payment-page__method-button--active">
                 UPI
               </button>
-              <button
-                type="button"
-                className={
-                  paymentMethod === 'card'
-                    ? 'payment-page__method-button payment-page__method-button--active'
-                    : 'payment-page__method-button'
-                }
-                onClick={() => setPaymentMethod('card')}
-              >
+              <button type="button" className="payment-page__method-button">
                 Card
               </button>
             </div>
 
-            {paymentMethod === 'upi' ? (
-              <div className="payment-page__upi-block">
-                <select name="upiApp" value={paymentDetails.upiApp} onChange={handleChange} required>
-                  {upiApps.map((app) => (
-                    <option key={app.id} value={app.id}>
-                      {app.label}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  name="upiId"
-                  value={paymentDetails.upiId}
-                  onChange={handleChange}
-                  placeholder="Enter your UPI ID"
-                  required
-                />
-                <div className="payment-page__request-card">
-                  <strong>UPI App Request</strong>
-                  <p>
-                    Use {selectedUpiApp?.label} to pay Rs {total} to {merchantName}.
-                  </p>
-                  <small>Merchant UPI ID: {merchantUpiId}</small>
-                  <div className="payment-page__request-actions">
-                    <button type="button" className="payment-page__ghost-button" onClick={handleSendUpiRequest}>
-                      Prepare Request
-                    </button>
-                    {upiRequestSent && (
-                      <a className="payment-page__upi-link" href={upiLink}>
-                        Open {selectedUpiApp?.label}
-                      </a>
-                    )}
-                  </div>
-                  <small>
-                    Real collect requests need backend gateway integration. This app opens the selected UPI app with the
-                    payment amount and merchant details already filled in.
-                  </small>
+            <div className="payment-page__upi-block">
+              <select name="upiApp" defaultValue={paymentDetails.upiApp} required>
+                {upiApps.map((app) => (
+                  <option key={app.id} value={app.id}>
+                    {app.label}
+                  </option>
+                ))}
+              </select>
+              <input
+                name="upiId"
+                defaultValue={paymentDetails.upiId}
+                placeholder="Enter your UPI ID"
+                required
+              />
+              <div className="payment-page__request-card">
+                <strong>UPI App Request</strong>
+                <p>
+                  Use {selectedUpiApp?.label} to pay Rs {total} to {merchantName}.
+                </p>
+                <small>Merchant UPI ID: {merchantUpiId}</small>
+                <div className="payment-page__request-actions">
+                  <a className="payment-page__upi-link" href={upiLink}>
+                    Open {selectedUpiApp?.label}
+                  </a>
                 </div>
+                <small>
+                  Real collect requests need backend gateway integration. This app opens the selected UPI app with the
+                  payment amount and merchant details already filled in.
+                </small>
               </div>
-            ) : (
-              <>
-                <input
-                  name="cardName"
-                  value={paymentDetails.cardName}
-                  onChange={handleChange}
-                  placeholder="Name on card"
-                  required
-                />
-                <input
-                  name="cardNumber"
-                  value={paymentDetails.cardNumber}
-                  onChange={handleChange}
-                  placeholder="Card number"
-                  required
-                />
-                <div className="payment-page__card-row">
-                  <input name="expiry" value={paymentDetails.expiry} onChange={handleChange} placeholder="MM/YY" required />
-                  <input name="cvv" value={paymentDetails.cvv} onChange={handleChange} placeholder="CVV" required />
-                </div>
-              </>
-            )}
+            </div>
 
-            <button
-              type="submit"
-              className="payment-page__primary-button"
-              disabled={!cartDetails.length || (paymentMethod === 'upi' && !upiRequestSent)}
-            >
+            <button type="submit" className="payment-page__primary-button" disabled={!cartDetails.length}>
               Pay Rs {total}
             </button>
           </form>

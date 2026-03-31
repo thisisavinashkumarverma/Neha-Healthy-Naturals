@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react'
 import StoreNavbar from '../../components/store-navbar/StoreNavbar'
 import SiteFooter from '../../components/site-footer/SiteFooter'
 import './CartPage.css'
@@ -16,33 +15,23 @@ function CartPage({
   onUpdateCartQuantity,
   onStartCheckout,
 }) {
-  const [formData, setFormData] = useState(checkoutDraft)
-
-  const cartDetails = useMemo(
-    () =>
-      cartItems.map((item) => {
-        const product = products.find((entry) => entry.id === item.productId)
-        return {
-          ...item,
-          product,
-          subtotal: (product?.price ?? 0) * item.quantity,
-        }
-      }),
-    [cartItems, products],
-  )
+  const cartDetails = cartItems.map((item) => {
+    const product = products.find((entry) => entry.id === item.productId)
+    return {
+      ...item,
+      product,
+      subtotal: (product?.price ?? 0) * item.quantity,
+    }
+  })
 
   const subtotal = cartDetails.reduce((sum, item) => sum + item.subtotal, 0)
   const shipping = subtotal > 0 ? 90 : 0
   const total = subtotal + shipping
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setFormData((current) => ({ ...current, [name]: value }))
-  }
-
   const handleContinue = (event) => {
     event.preventDefault()
-    onStartCheckout(formData)
+    const details = Object.fromEntries(new FormData(event.currentTarget).entries())
+    onStartCheckout?.(details)
   }
 
   return (
@@ -86,9 +75,9 @@ function CartPage({
                     <strong>{product?.name}</strong>
                     <p>{product?.size}</p>
                     <div className="cart-page__qty">
-                      <button type="button" onClick={() => onUpdateCartQuantity(product.id, quantity - 1)}>-</button>
+                      <button type="button" onClick={() => onUpdateCartQuantity?.(product.id, quantity - 1)}>-</button>
                       <span>{quantity}</span>
-                      <button type="button" onClick={() => onUpdateCartQuantity(product.id, quantity + 1)}>+</button>
+                      <button type="button" onClick={() => onUpdateCartQuantity?.(product.id, quantity + 1)}>+</button>
                     </div>
                   </div>
                   <strong>Rs {lineTotal}</strong>
@@ -109,11 +98,11 @@ function CartPage({
               <span>Connected to payment</span>
             </div>
 
-            <input name="customerName" value={formData.customerName} onChange={handleChange} placeholder="Customer name" required />
-            <input name="customerEmail" type="email" value={formData.customerEmail} onChange={handleChange} placeholder="Email address" required />
-            <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone number" required />
-            <textarea name="address" value={formData.address} onChange={handleChange} placeholder="Delivery address" rows="4" required />
-            <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Order notes (optional)" rows="3" />
+            <input name="customerName" defaultValue={checkoutDraft.customerName} placeholder="Customer name" required />
+            <input name="customerEmail" type="email" defaultValue={checkoutDraft.customerEmail} placeholder="Email address" required />
+            <input name="phone" defaultValue={checkoutDraft.phone} placeholder="Phone number" required />
+            <textarea name="address" defaultValue={checkoutDraft.address} placeholder="Delivery address" rows="4" required />
+            <textarea name="notes" defaultValue={checkoutDraft.notes} placeholder="Order notes (optional)" rows="3" />
 
             <button type="submit" className="cart-page__primary-button" disabled={!cartDetails.length}>
               Continue to Payment

@@ -83,7 +83,7 @@ function OrdersPage({ user, orders, cartCount, onLogout, onNavigate, onOpenAdmin
                   Contact Support
                 </button>
                 {canCancel(order.status) ? (
-                  <button type="button" className="orders-page__danger-button" onClick={() => onCancelOrder(order.id)}>
+                  <button type="button" className="orders-page__danger-button" onClick={() => onCancelOrder?.(order.id)}>
                     Cancel Order
                   </button>
                 ) : (

@@ -1,63 +1,69 @@
-const AUTH_STORAGE_KEY = 'nhn-auth-session'
+const api = import.meta.env.VITE_API_URL;
 
-export const defaultUser = {
-  name: 'Priya',
-  email: 'priya@nhn.com',
-  role: 'customer',
-}
+export const reqOtp = async(formData)=>{
 
-export const createCheckoutDraftForUser = (user = defaultUser) => ({
-  customerName: user.name,
-  customerEmail: user.email,
-  address: '',
-  phone: '',
-  notes: '',
-})
+  try{
+    const res = await fetch(`${api}/reqotp`,{
+      method: "POST",
+      headers: {"content-type":"application/json"},
+      body: JSON.stringify(formData)
+    });
+    const data = await res.json();
+    if(!res.ok){
+      throw new Error(data?.message);
+    
+    }
 
-export const loadAuthSession = () => {
-  if (typeof window === 'undefined') {
-    return null
-  }
+    return data;
 
-  try {
-    const rawSession = window.localStorage.getItem(AUTH_STORAGE_KEY)
-    return rawSession ? JSON.parse(rawSession) : null
-  } catch {
-    return null
+  }catch(err){
+
+    throw err;
+
   }
 }
 
-export const persistAuthSession = (session) => {
-  if (typeof window === 'undefined') {
-    return
+export const verifyotp = async(formData)=>{
+  
+  try{
+    const res = await fetch(`${api}/verifyotp`,{
+      method: "POST",
+      headers: {"content-type":"application/json"},
+      body: JSON.stringify(formData)
+    });
+    const data = await res.json();
+    if(!res.ok){
+      throw new Error(data?.message);
+    }
+
+    return data;
+
+  }catch(err){
+    console.error(err.message);
+    throw err;
+
   }
 
-  window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session))
 }
 
-export const clearAuthSession = () => {
-  if (typeof window === 'undefined') {
-    return
+export const signup = async(formData, token)=>{
+
+  try{
+    const res = await fetch(`${api}/signup`,{
+      method: "POST",
+      headers: {"content-type": "application/json"},
+      body: JSON.stringify(formData)
+    });
+    const data = await res.json();
+    if(!res.ok){
+      throw new Error(data?.message);
+    }
+
+    return data;
+
+  }catch(err){
+    console.error(err.message);
+    throw err;
+
   }
-
-  window.localStorage.removeItem(AUTH_STORAGE_KEY)
 }
-
-const createResolvedUser = ({ name, email, role = 'customer' }) => {
-  const resolvedName = name?.trim() || (role === 'admin' ? 'Admin' : 'Customer')
-
-  return {
-    name: resolvedName,
-    email: email?.trim() || `${resolvedName.toLowerCase()}@nhn.com`,
-    role,
-  }
-}
-
-export const loginUser = (credentials) => createResolvedUser(credentials)
-
-export const signupUser = ({ name, email }) =>
-  createResolvedUser({
-    name,
-    email,
-    role: 'customer',
-  })

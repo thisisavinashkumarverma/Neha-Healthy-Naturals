@@ -1,72 +1,24 @@
-.signup-page {
-  padding: 1.5rem;
-}
-
-.signup-page__container {
-  width: min(1200px, 100%);
+form{
+  display: flex;
+  flex-direction:column ;
+  gap: 10px;
+  padding: 10px;
+  max-width: 340px;
   margin: 0 auto;
+  /* border: 2px solid red; */
+  /* background-color: #333; */
+  border-radius: 8px;
+  /* color: #fff; */
+}
+p{
+  padding: 10px;
+  color: fff;
 }
 
-.signup-page__panel {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 1.5rem;
-  align-items: center;
-  margin-top: 1.25rem;
-}
-
-.signup-page__content {
-  padding: 2rem;
-}
-
-.signup-page__content span {
-  display: inline-block;
-  margin-bottom: 0.8rem;
-  color: #8e481d;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.signup-page__content h2 {
-  margin: 0;
-  font-size: clamp(2rem, 4vw, 3.4rem);
-  line-height: 1.08;
-  color: #2d221b;
-}
-
-.signup-page__content p {
-  max-width: 480px;
-  color: #66584a;
-  font-size: 1.02rem;
-}
-
-@media (max-width: 900px) {
-  .signup-page__panel {
-    grid-template-columns: 1fr;
-  }
-
-  .signup-page__content {
-    padding: 0.5rem;
-    order: -1;
-  }
-}
-
-@media (max-width: 640px) {
-  .signup-page {
-    padding: 1rem;
-  }
-
-  .signup-page__panel {
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .signup-page__content {
-    padding: 0;
-  }
-
-  .signup-page__content p {
-    font-size: 0.96rem;
-  }
+.form-container{
+  margin: 0 auto;
+border: 1px solid #333;
+max-width: 340px;
+border-radius: 8px;
+color: #333;
 }

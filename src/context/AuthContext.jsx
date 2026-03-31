@@ -1,71 +1,103 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import {
-  clearAuthSession,
-  defaultUser,
-  loadAuthSession,
-  loginUser,
-  persistAuthSession,
-  signupUser,
-} from '../services/authservieces'
+import { createContext, useState, useContext, useEffect } from 'react'
 
-const AuthContext = createContext(null)
 
-function AuthProvider({ children }) {
-  const storedSession = loadAuthSession()
-  const [currentUser, setCurrentUser] = useState(storedSession?.currentUser ?? defaultUser)
-  const [isAuthenticated, setIsAuthenticated] = useState(storedSession?.isAuthenticated ?? false)
+import * as authService from '../services/authservieces'
 
-  const login = (credentials) => {
-    const nextUser = loginUser(credentials)
-    setCurrentUser(nextUser)
-    setIsAuthenticated(true)
-    return nextUser
+
+const AuthContext = createContext()
+
+export const AuthProvider = ({ children }) => {
+
+  const [isLoggedIn, setLogin] = useState(false)
+  const [otpStatus, setOtpStatus] = useState('')
+  const [profile, setProfile] = useState([])
+
+  const [signupToken, setToken] = useState('');
+
+  useEffect(()=>{
+    const signToken = localStorage.getItem('signToken')
+    console.log(signToken)
+    if(signToken){
+      setToken(signToken);
+    }
+  })
+
+  async function reqOtpContext(formData) {
+
+    try {
+      setOtpStatus('')
+      const res = await authService.reqOtp(formData)
+     
+      if(!res.success){
+        console.log(res)
+        setOtpStatus(res.message);
+        return;
+      }
+      
+   
+        
+    } catch (err) {
+      console.error(err.message)
+      setOtpStatus(err.message)
+    }
+
   }
 
-  const signup = (payload) => {
-    const nextUser = signupUser(payload)
-    setCurrentUser(nextUser)
-    setIsAuthenticated(true)
-    return nextUser
+  async function verifyOtpContext(formData){
+      try{
+        const res = await authService.verifyotp(formData);
+        if(!res.success){
+          setOtpStatus(res.message);
+          return;
+        }
+        localStorage.setItem('signToken', res.signupToken);
+      
+        console.log(res.signupToken);
+
+        localStorage.removeItem('email')
+        
+        setOtpStatus(res.message)
+
+
+      }catch(err){
+        console.log(err.message)
+
+        setOtpStatus(err.message)
+      }
   }
 
-  const logout = () => {
-    setCurrentUser(defaultUser)
-    setIsAuthenticated(false)
-    clearAuthSession()
+  async function signupContext(password){
+    try{
+
+      const payload={
+        signupToken : signupToken,
+        password:password
+      }
+      const res = await authService.signup(payload);
+      console.log(res)
+      if(!res.success){
+        setOtpStatus(res.message);
+        console.error(res);
+        return;
+      }
+
+      setOtpStatus(res.message);
+
+      
+    }catch(err){
+      console.error(err);
+      setOtpStatus(err.message)
+    }
+    
   }
 
-  useEffect(() => {
-    if (!isAuthenticated) return
+  return (
+    <AuthContext.Provider value={{ reqOtpContext, verifyOtpContext,signupContext, otpStatus, isLoggedIn, profile, setProfile, setLogin }}>
+      {children}
+    </AuthContext.Provider>
 
-    persistAuthSession({
-      currentUser,
-      isAuthenticated,
-    })
-  }, [currentUser, isAuthenticated])
-
-  const value = useMemo(
-    () => ({
-      currentUser,
-      isAuthenticated,
-      login,
-      signup,
-      logout,
-    }),
-    [currentUser, isAuthenticated],
   )
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-const useAuth = () => {
-  const context = useContext(AuthContext)
-
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-
-  return context
-}
-
-export { AuthProvider, useAuth }
+export const useAuth = () => useContext(AuthContext)
