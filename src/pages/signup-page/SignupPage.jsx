@@ -10,10 +10,10 @@ function SignupPage({ onBack, onLoginLink, onNavigate }) {
   const [otp, setOtp] = useState('')
   const [form, setForm] = useState();
   const [password, setPass] = useState();
-  const {reqOtpContext,verifyOtpContext,signupContext, otpStatus} = useAuth();
+  const {reqOtpContext,verifyOtpContext,signupContext, otpStatus, sendOTP, verify} = useAuth();
 
   const navigate = useNavigate()
-  
+  console.log(sendOTP)
 
   const handleOtp = async(e)=>{
     e.preventDefault();
@@ -27,6 +27,8 @@ function SignupPage({ onBack, onLoginLink, onNavigate }) {
  
  
   }
+
+  let isEmailEmpty = email.trim()=='';
 
   const handleOtpInput=(e)=>{
     setOtp(e.target.value)
@@ -76,18 +78,24 @@ function SignupPage({ onBack, onLoginLink, onNavigate }) {
 
         <div className="signup-page__panel">
           <div className='form-container'>
-         <form  >
+         <form onSubmit={handleOtp} >
           <label >Email</label>
-          <input type='email'className="email" name='email' value={email.email} onChange={handleEmail}></input>
-          <button type='button'onClick={handleOtp}>request OTP</button>
+          <input type='email'className="email" name='email' value={email.email} onChange={handleEmail} required={true}></input>
+          <button disabled={isEmailEmpty}>request OTP</button>
+          </form>
+
+        <form onSubmit={handleVerify}>
           <label>OTP</label>
-          <input type='text' placeholder='enter otp' name='recOtp' value={otp.recOtp} onChange={handleOtpInput}></input>
-          <button type='submit' onClick={handleVerify}>verify</button>
+          <input type='text' placeholder='enter otp' disabled={sendOTP} name='recOtp'  value={otp.recOtp} onChange={handleOtpInput} required></input>
+          <button disabled={sendOTP}>verify</button>
+        </form>
+
+        <form onSubmit={handleSignup}>
           <label>Password</label>
-          <input type='password' onChange={passHandle}></input>
+          <input type='password' onChange={passHandle} required></input>
           <p>{otpStatus}</p>
-          <button type='button' onClick={handleSignup}>Create Account</button>
-         </form>
+          <button disabled={verify} >Create Account</button>
+        </form>
 
          <p>Already have an acc? <a onClick={()=>navigate("/login")}>Login</a></p>
          </div>

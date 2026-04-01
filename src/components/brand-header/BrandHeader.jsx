@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './BrandHeader.css'
+import { useAuth } from '../../context/AuthContext'
 
 function BrandHeader({
   onLoginClick,
@@ -40,6 +41,7 @@ function BrandHeader({
     onNavigate?.('home-orders')
     setIsMenuOpen(false)
   }
+  const {isLoggedIn} = useAuth()
 
   return (
     <header className={`brand-header ${compact ? 'brand-header--compact' : ''}`}>
@@ -82,7 +84,7 @@ function BrandHeader({
         </nav>
 
         <div className="brand-header__actions">
-          {isAuthenticated ? (
+          {isLoggedIn ? (
             <>
               <button type="button" className="brand-header__button brand-header__button--ghost" onClick={handleMyOrders}>
                 My Orders

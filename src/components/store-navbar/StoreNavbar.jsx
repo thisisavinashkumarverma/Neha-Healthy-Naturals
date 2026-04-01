@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import './StoreNavbar.css'
+import { useAuth } from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 function StoreNavbar({
   user,
@@ -42,9 +44,11 @@ function StoreNavbar({
     onOpenAdmin?.()
     setIsMenuOpen(false)
   }
-
+const{logout} = useAuth();
+const navigate = useNavigate();
   const handleLogout = () => {
-    onLogout?.()
+   logout();
+   navigate("/")
     setIsMenuOpen(false)
   }
 

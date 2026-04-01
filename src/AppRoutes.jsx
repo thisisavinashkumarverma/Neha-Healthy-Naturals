@@ -43,10 +43,6 @@ function AppRoutes() {
     navigate('admin-insights')
   }
 
-  const handleLogin = ({ role }) => {
-    navigate(role === 'admin' ? 'admin-insights' : 'home')
-  }
-
   const handleLogout = () => {
     navigate('landing')
   }
@@ -100,7 +96,6 @@ function AppRoutes() {
     onTogglePublish: undefined,
     onUpdateOrderStatus: undefined,
   }
-
   return (
     <div className="app-shell">
       <Routes>
@@ -112,9 +107,8 @@ function AppRoutes() {
           path={ROUTE_PATHS.login}
           element={
             <LoginPage
-              onBack={() => navigate('landing')}
-              onLogin={handleLogin}
-              onSignupLink={() => navigate('signup')}
+            
+           
               onNavigate={navigate}
             />
           }
@@ -125,7 +119,7 @@ function AppRoutes() {
           element={
             <SignupPage
               onBack={() => navigate('landing')}
-              onLoginLink={() => navigate('login')}
+           
               onNavigate={navigate}
             />
           }
@@ -136,7 +130,7 @@ function AppRoutes() {
             key={routeKey}
             path={getRoutePath(routeKey)}
             element={
-              <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
+              <ProtectedRoute redirectTo={ROUTE_PATHS.login}>
                 <HomePage {...customerHomeProps} />
               </ProtectedRoute>
             }
@@ -146,7 +140,7 @@ function AppRoutes() {
         <Route
           path={ROUTE_PATHS['home-cart']}
           element={
-            <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
+            <ProtectedRoute redirectTo={ROUTE_PATHS.login}>
               <CartPage
                 user={sampleCustomerUser}
                 products={sampleStorefrontProducts}
@@ -167,7 +161,7 @@ function AppRoutes() {
         <Route
           path={ROUTE_PATHS['home-orders']}
           element={
-            <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
+            <ProtectedRoute redirectTo={ROUTE_PATHS.login}>
               <OrdersPage
                 user={sampleCustomerUser}
                 orders={sampleOrders}
@@ -184,7 +178,7 @@ function AppRoutes() {
         <Route
           path={ROUTE_PATHS['home-payment']}
           element={
-            <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
+            <ProtectedRoute redirectTo={ROUTE_PATHS.login}>
               <PaymentPage
                 user={sampleCustomerUser}
                 products={sampleStorefrontProducts}
@@ -207,7 +201,7 @@ function AppRoutes() {
             key={routeKey}
             path={getRoutePath(routeKey)}
             element={
-              <ProtectedRoute allow redirectTo={ROUTE_PATHS.login}>
+              <ProtectedRoute redirectTo={ROUTE_PATHS.login}>
                 <AdminPanel {...adminPanelProps} />
               </ProtectedRoute>
             }

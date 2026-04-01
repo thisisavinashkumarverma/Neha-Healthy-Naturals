@@ -67,3 +67,26 @@ export const signup = async(formData, token)=>{
 
   }
 }
+
+
+export const login = async(formData)=>{
+try{
+    const res = await fetch(`${api}/signin`,{
+      method: "POST",
+      headers: {"content-type": "application/json"},
+      body: JSON.stringify(formData)
+    });
+    const data = await res.json();
+    if(!res.ok){
+      throw new Error(data?.message);
+    }
+
+    return data;
+
+  }catch(err){
+    console.error(err.message);
+    throw err;
+
+  }
+}
+

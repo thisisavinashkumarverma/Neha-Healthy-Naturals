@@ -8,19 +8,22 @@ const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
 
-  const [isLoggedIn, setLogin] = useState(false)
+  const [isLoggedIn, setLogin] = useState(() => Boolean(localStorage.getItem('token')))
   const [otpStatus, setOtpStatus] = useState('')
+  const [sendOTP, setSent] = useState(true);
+  const [verify, setVerify]= useState(true);
   const [profile, setProfile] = useState([])
 
-  const [signupToken, setToken] = useState('');
+  const [signupToken, setToken] = useState(() => localStorage.getItem('signToken') || '');
 
-  useEffect(()=>{
-    const signToken = localStorage.getItem('signToken')
-    console.log(signToken)
-    if(signToken){
-      setToken(signToken);
+  useEffect(() => {
+    if (signupToken) {
+      localStorage.setItem('signToken', signupToken)
+      return
     }
-  })
+
+    localStorage.removeItem('signToken')
+  }, [signupToken])
 
   async function reqOtpContext(formData) {
 
@@ -30,7 +33,8 @@ export const AuthProvider = ({ children }) => {
      
       if(!res.success){
         console.log(res)
-        setOtpStatus(res.message);
+        setOtpStatus(res.message );
+        setSent(false);
         return;
       }
       
@@ -38,7 +42,7 @@ export const AuthProvider = ({ children }) => {
         
     } catch (err) {
       console.error(err.message)
-      setOtpStatus(err.message)
+      setOtpStatus(err.message+ ' or invalid email')
     }
 
   }
@@ -51,7 +55,8 @@ export const AuthProvider = ({ children }) => {
           return;
         }
         localStorage.setItem('signToken', res.signupToken);
-      
+        setToken(res.signupToken);
+        setVerify(false);
         console.log(res.signupToken);
 
         localStorage.removeItem('email')
@@ -80,9 +85,9 @@ export const AuthProvider = ({ children }) => {
         console.error(res);
         return;
       }
-
+      setToken('')
       setOtpStatus(res.message);
-
+      
       
     }catch(err){
       console.error(err);
@@ -91,8 +96,40 @@ export const AuthProvider = ({ children }) => {
     
   }
 
+
+
+  async function login(formData){
+    try{
+      setOtpStatus('');
+      const res = await authService.login(formData);
+
+     
+
+      if(!res.success){
+        console.error(res.message);
+        setOtpStatus(res.message);
+        return false;
+      }
+      localStorage.setItem("token",res.token);
+      console.log(res.token);
+      setOtpStatus(res.message);
+      setLogin(true);
+      return true;
+      
+    }catch(err){
+        console.error(err);
+        setOtpStatus(err.message);
+        return false;
+    }
+  }
+
+  function logout(){
+    localStorage.removeItem('token')
+    setLogin(false)
+    setProfile([])
+  }
   return (
-    <AuthContext.Provider value={{ reqOtpContext, verifyOtpContext,signupContext, otpStatus, isLoggedIn, profile, setProfile, setLogin }}>
+    <AuthContext.Provider value={{ reqOtpContext, verifyOtpContext,signupContext,login,logout, sendOTP, verify, otpStatus, isLoggedIn, profile, setProfile, setLogin }}>
       {children}
     </AuthContext.Provider>
 
